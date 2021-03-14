@@ -75,20 +75,35 @@ void addFilesToArray(FILE *firstFile, FILE *secondFile, struct rowMergedFile **a
 //     return result;
 // }
 
-// int mergeArrayToTemporaryFile(struct rowMergedFile **arrayOfFiles, int index){
-//     char temp_filename[] = "/tmp/merged_files.XXXXXX";
-//     int fd = mkstemp(temp_filename);
+FILE * mergeArrayToTemporaryFile(struct rowMergedFile **arrayOfFiles, int index){
+    FILE *fh = tmpfile();   //tworzy plik tymczasowy
 
-//     // unlink(temp_filename);
+    for(int i = 0; i < arrayOfFiles[index]->n_rows; i++){
+        fprintf(fh, arrayOfFiles[index]->rows[i]);
+    }
 
-//     for(int i = 0; i < arrayOfFiles[index]->n_rows; i++){
-//         write(fd, &arrayOfFiles[index]->rows[i], sizeof(&arrayOfFiles[index]->rows[i]));
-//     }
+    return fh;
+}
 
-//     return fd;
-// }
+void readFromTemporaryFileToArray(FILE* temp_file, struct rowMergedFile **arrayOfFiles, int index){
+    char * line = NULL;
+    size_t len = 0;
+    ssize_t read;
+    int i = 0;
 
-char * read(int temp_file){
+    arrayOfFiles[index]->n_rows = getFileLines(temp_file)/2;
+
+    arrayOfFiles[index]->rows = (char **)calloc(arrayOfFiles[index]->n_rows, sizeof(char *));
+
+    rewind(temp_file);    // przewija plik na sam początek
+
+    while ((read = getline(&line, &len, temp_file)) != -1) {
+        arrayOfFiles[index]->rows[i] = (char *)calloc(100, sizeof(char));       //TU GDZIEŚ JEST BŁĄD, jak się zakomentuje tą i poniższą linijkę, to nie wywala błędu
+        strcpy(arrayOfFiles[index]->rows[i], line);
+        printf("%s", line);
+
+        i++;
+    }
 
 }
 

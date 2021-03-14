@@ -21,29 +21,7 @@ void freeCharArray(char **array, int n_array){
     free(array);
 }
 
-
-int main(int argc, char *argv[]){
-    FILE *firstFile;
-    FILE *secondFile;
-    int n = 1;
-    struct rowMergedFile **mainArray = makeMainTable(n);
-
-    firstFile = openFileToRead("file1.txt");
-    secondFile = openFileToRead("file2.txt");
-
-    addFilesToArray(firstFile, secondFile, mainArray, 0);
-
-    // removeOneBlock(mainArray, 0);
-
-    print3DArray(mainArray, n);
-
-    // printf("%d", mergeArrayToTemporaryFile(mainArray, 0));
-
-    fclose(firstFile);
-    fclose(secondFile);
-
-
-
+void splitTest(){
     char **test = (char **)calloc(2, sizeof(char *));
     test[0] = calloc(30, sizeof(char));
     test[1] = calloc(30, sizeof(char));
@@ -59,6 +37,39 @@ int main(int argc, char *argv[]){
 
     freeCharArray(test, 2);
     freeCharArray(tmp, 4);
+}
+
+
+int main(int argc, char *argv[]){
+    FILE *firstFile;
+    FILE *secondFile;
+    int n = 1;
+    struct rowMergedFile **mainArray = makeMainTable(n);
+
+    firstFile = openFileToRead("file1.txt");
+    secondFile = openFileToRead("file2.txt");
+
+    addFilesToArray(firstFile, secondFile, mainArray, 0);
+
+    
+    // print3DArray(mainArray, n);
+
+    FILE * tmp_file = mergeArrayToTemporaryFile(mainArray, 0);
+
+    removeOneBlock(mainArray, 0);
+
+    // printf("%d", tmp_file_id);
+    readFromTemporaryFileToArray(tmp_file, mainArray, 0);
+
+    // print3DArray(mainArray, n);
+
+    fclose(tmp_file);
+
+
+    // printf("%d", mergeArrayToTemporaryFile(mainArray, 0));
+
+    fclose(firstFile);
+    fclose(secondFile);
 
     free3dArray(mainArray, n);
 
