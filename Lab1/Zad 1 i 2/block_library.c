@@ -31,11 +31,13 @@ int getFileLines(FILE *fp){
     char * line = NULL;
     size_t len = 0;
 
+    rewind(fp);    // przewija plik na sam początek
+
     while((read = getline(&line, &len, fp)) != -1){
         count++;
     }
 
-    fseek(fp, 0, 0);
+    rewind(fp);    // przewija plik na sam początek
 
     return count*2;
 }
@@ -91,16 +93,15 @@ void readFromTemporaryFileToArray(FILE* temp_file, struct rowMergedFile **arrayO
     ssize_t read;
     int i = 0;
 
+    removeOneBlock(arrayOfFiles, index);        // zwolnienie pamięci dla bloku, jeśli byłaby zajęta
+
     arrayOfFiles[index]->n_rows = getFileLines(temp_file)/2;
 
     arrayOfFiles[index]->rows = (char **)calloc(arrayOfFiles[index]->n_rows, sizeof(char *));
 
-    rewind(temp_file);    // przewija plik na sam początek
-
     while ((read = getline(&line, &len, temp_file)) != -1) {
         arrayOfFiles[index]->rows[i] = (char *)calloc(len, sizeof(char));       //TU GDZIEŚ JEST BŁĄD, jak się zakomentuje tą i poniższą linijkę, to nie wywala błędu
         strcpy(arrayOfFiles[index]->rows[i], line);
-        printf("%s", line);
 
         i++;
     }
@@ -123,6 +124,9 @@ void removeOneLineFromBlock(struct rowMergedFile ** array, int blockIndex, int l
 
 
 void removeOneBlock(struct rowMergedFile ** array, int blockIndex){
+    if(array[blockIndex]->rows == NULL)
+        return;
+
     for(int j = 0; j <  array[blockIndex]->n_rows; j++){
         free(array[blockIndex]->rows[j]);
     }

@@ -56,17 +56,19 @@ int main(int argc, char *argv[]){
 
     FILE * tmp_file = mergeArrayToTemporaryFile(mainArray, 0);
 
-    removeOneBlock(mainArray, 0);
+    removeOneLineFromBlock(mainArray, 0, 2);
+    print3DArray(mainArray, n);
+    printf("\n");
+
+    // removeOneBlock(mainArray, 0);
 
     // printf("%d", tmp_file_id);
     readFromTemporaryFileToArray(tmp_file, mainArray, 0);
 
-    // print3DArray(mainArray, n);
+    print3DArray(mainArray, n);
 
     fclose(tmp_file);
 
-
-    // printf("%d", mergeArrayToTemporaryFile(mainArray, 0));
 
     fclose(firstFile);
     fclose(secondFile);
