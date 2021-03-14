@@ -98,7 +98,7 @@ void readFromTemporaryFileToArray(FILE* temp_file, struct rowMergedFile **arrayO
     rewind(temp_file);    // przewija plik na sam początek
 
     while ((read = getline(&line, &len, temp_file)) != -1) {
-        arrayOfFiles[index]->rows[i] = (char *)calloc(100, sizeof(char));       //TU GDZIEŚ JEST BŁĄD, jak się zakomentuje tą i poniższą linijkę, to nie wywala błędu
+        arrayOfFiles[index]->rows[i] = (char *)calloc(len, sizeof(char));       //TU GDZIEŚ JEST BŁĄD, jak się zakomentuje tą i poniższą linijkę, to nie wywala błędu
         strcpy(arrayOfFiles[index]->rows[i], line);
         printf("%s", line);
 
