@@ -6,8 +6,6 @@
 #include <time.h>
 #include "block_library.h"
 
-#define BILLION  1000000000L;
-
 void free3dArray(struct rowMergedFile ** array, int n_array){
     if(array == NULL){
         return;
@@ -15,8 +13,10 @@ void free3dArray(struct rowMergedFile ** array, int n_array){
 
     for(int i = 0; i < n_array; i++){
         if(array[i] != NULL){
-            for(int j = 0; j <  array[i]->n_rows; j++){
-                free(array[i]->rows[j]);
+            if(array[i]->rows != NULL){
+                for(int j = 0; j <  array[i]->n_rows; j++){
+                    free(array[i]->rows[j]);
+                }
             }
             free(array[i]);
         }
@@ -45,8 +45,16 @@ void freeTmsTimes(struct tms **tms_times){
     free(tms_times);
 }
 
+
 double calculateDiffrenceBetweenTimes(clock_t startTime, clock_t endTime){
     return (double) (endTime - startTime) / sysconf(_SC_CLK_TCK);
+}
+
+void printTimes(char* operationName, clock_t real_time[], struct tms **tms_times){
+    printf("%25s", operationName);
+    printf("%15lf", calculateDiffrenceBetweenTimes(real_time[0], real_time[1]));    // czas rzeczywisty
+    printf("%15lf", calculateDiffrenceBetweenTimes(tms_times[0]->tms_utime, tms_times[1]->tms_utime));  // czas użytkownika
+    printf("%15lf\n", calculateDiffrenceBetweenTimes(tms_times[0]->tms_stime, tms_times[1]->tms_stime));  // czas systemowy
 }
 
 int main(int argc, char *argv[]){
@@ -55,6 +63,8 @@ int main(int argc, char *argv[]){
     clock_t real_time[2];
 
     struct tms **tms_times = initializeNewTmsTimes();
+
+    printf("%25s%15s%15s%15s\n", "OPERATION" ,"REAL_TIME", "USER_TIME", "SYSTEM_TIME");
 
     for(int i = 1; i < argc; i++){
         if(strcmp(argv[i], "create_table") == 0){
@@ -78,14 +88,35 @@ int main(int argc, char *argv[]){
             }
 
             real_time[1] = times(tms_times[1]);
-
             
-            printf("%lf\n", calculateDiffrenceBetweenTimes(real_time[0], real_time[1]));    // czas rzeczywisty
-            printf("%lf\n", calculateDiffrenceBetweenTimes(tms_times[0]->tms_utime, tms_times[1]->tms_utime));  // czas użytkownika
-            printf("%lf\n", calculateDiffrenceBetweenTimes(tms_times[0]->tms_stime, tms_times[1]->tms_stime));  // czas systemowy
+            printTimes("Merging", real_time, tms_times);
+
+            FILE *tmpFile;
+            real_time[0] = times(tms_times[0]);
+            for(int j = 0; j < n_mainArray; j++){
+                tmpFile = mergeArrayToTemporaryFile(mainArray, 0);
+            }
+            
+            real_time[1] = times(tms_times[1]);
+            printTimes("Save to tmp files", real_time, tms_times);
+
+            real_time[0] = times(tms_times[0]);
+            for(int j = 0; j < 20; j++){
+                removeOneBlock(mainArray, 0);
+                readFromTemporaryFileToArray(tmpFile, mainArray, 0);
+            }
+            real_time[1] = times(tms_times[1]);
+            printTimes("20x remove add from tmp", real_time, tms_times);
+
+            fclose(tmpFile);
+
         }
         else if(strcmp(argv[i], "remove_block") == 0){
+            real_time[0] = times(tms_times[0]);
             removeOneBlock(mainArray, atoi(argv[++i]));
+            real_time[1] = times(tms_times[1]);
+            printTimes("Remove block", real_time, tms_times);
+
         }
         else if(strcmp(argv[i], "remove_row") == 0){
             int block_index = atoi(argv[++i]);
