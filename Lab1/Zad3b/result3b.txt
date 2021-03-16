@@ -1,0 +1,213 @@
+# Static libraries O0
+
+#Pliki z małą ilością linii
+                OPERATION      REAL_TIME      USER_TIME    SYSTEM_TIME
+                  Merging       0.440000       0.170000       0.260000
+        Save to tmp files       0.300000       0.120000       0.180000
+  20x remove add from tmp       0.240000       0.170000       0.070000
+             Remove block       0.000000       0.000000       0.000000
+
+#Pliki średnie, ale z dużą ilością tekstu w liniach
+                OPERATION      REAL_TIME      USER_TIME    SYSTEM_TIME
+                  Merging       0.320000       0.170000       0.140000
+        Save to tmp files       0.260000       0.060000       0.200000
+  20x remove add from tmp       6.010000       2.630000       3.370000
+             Remove block       0.010000       0.000000       0.010000
+
+#Pliki z dużą ilością linii
+                OPERATION      REAL_TIME      USER_TIME    SYSTEM_TIME
+                  Merging       0.420000       0.290000       0.130000
+        Save to tmp files       0.240000       0.130000       0.110000
+  20x remove add from tmp      10.900000       8.470000       2.410000
+             Remove block       0.130000       0.120000       0.010000
+
+
+# Static libraries O1
+
+#Pliki z małą ilością linii
+                OPERATION      REAL_TIME      USER_TIME    SYSTEM_TIME
+                  Merging       0.420000       0.200000       0.210000
+        Save to tmp files       0.290000       0.100000       0.190000
+  20x remove add from tmp       0.250000       0.180000       0.070000
+             Remove block       0.000000       0.000000       0.000000
+
+#Pliki średnie, ale z dużą ilością tekstu w liniach
+                OPERATION      REAL_TIME      USER_TIME    SYSTEM_TIME
+                  Merging       0.310000       0.120000       0.180000
+        Save to tmp files       0.260000       0.080000       0.180000
+  20x remove add from tmp       5.940000       2.650000       3.280000
+             Remove block       0.010000       0.010000       0.010000
+
+#Pliki z dużą ilością linii
+                OPERATION      REAL_TIME      USER_TIME    SYSTEM_TIME
+                  Merging       0.430000       0.300000       0.120000
+        Save to tmp files       0.240000       0.120000       0.110000
+  20x remove add from tmp      10.840000       8.470000       2.370000
+             Remove block       0.130000       0.120000       0.010000
+
+
+# Static libraries Os
+
+#Pliki z małą ilością linii
+                OPERATION      REAL_TIME      USER_TIME    SYSTEM_TIME
+                  Merging       0.420000       0.190000       0.230000
+        Save to tmp files       0.280000       0.100000       0.180000
+  20x remove add from tmp       0.250000       0.190000       0.060000
+             Remove block       0.000000       0.000000       0.000000
+
+#Pliki średnie, ale z dużą ilością tekstu w liniach
+                OPERATION      REAL_TIME      USER_TIME    SYSTEM_TIME
+                  Merging       0.310000       0.140000       0.160000
+        Save to tmp files       0.250000       0.070000       0.180000
+  20x remove add from tmp       6.040000       2.650000       3.390000
+             Remove block       0.010000       0.000000       0.010000
+
+#Pliki z dużą ilością linii
+                OPERATION      REAL_TIME      USER_TIME    SYSTEM_TIME
+                  Merging       0.430000       0.270000       0.150000
+        Save to tmp files       0.240000       0.120000       0.110000
+  20x remove add from tmp      10.760000       8.280000       2.480000
+             Remove block       0.130000       0.120000       0.010000
+
+
+# Shared libraries O0
+
+#Pliki z małą ilością linii
+                OPERATION      REAL_TIME      USER_TIME    SYSTEM_TIME
+                  Merging       0.420000       0.160000       0.250000
+        Save to tmp files       0.290000       0.110000       0.180000
+  20x remove add from tmp       0.240000       0.160000       0.070000
+             Remove block       0.000000       0.000000       0.000000
+
+#Pliki średnie, ale z dużą ilością tekstu w liniach
+                OPERATION      REAL_TIME      USER_TIME    SYSTEM_TIME
+                  Merging       0.320000       0.120000       0.180000
+        Save to tmp files       0.250000       0.060000       0.190000
+  20x remove add from tmp       5.970000       2.420000       3.520000
+             Remove block       0.010000       0.010000       0.000000
+
+#Pliki z dużą ilością linii
+                OPERATION      REAL_TIME      USER_TIME    SYSTEM_TIME
+                  Merging       0.440000       0.250000       0.170000
+        Save to tmp files       0.240000       0.150000       0.100000
+  20x remove add from tmp      10.920000       8.300000       2.610000
+             Remove block       0.130000       0.120000       0.010000
+
+
+# Shared libraries O1
+
+#Pliki z małą ilością linii
+                OPERATION      REAL_TIME      USER_TIME    SYSTEM_TIME
+                  Merging       0.430000       0.210000       0.200000
+        Save to tmp files       0.280000       0.110000       0.180000
+  20x remove add from tmp       0.240000       0.150000       0.090000
+             Remove block       0.000000       0.000000       0.000000
+
+#Pliki średnie, ale z dużą ilością tekstu w liniach
+                OPERATION      REAL_TIME      USER_TIME    SYSTEM_TIME
+                  Merging       0.310000       0.120000       0.190000
+        Save to tmp files       0.260000       0.070000       0.180000
+  20x remove add from tmp       5.950000       2.440000       3.500000
+             Remove block       0.010000       0.000000       0.010000
+
+#Pliki z dużą ilością linii
+                OPERATION      REAL_TIME      USER_TIME    SYSTEM_TIME
+                  Merging       0.420000       0.270000       0.140000
+        Save to tmp files       0.240000       0.140000       0.100000
+  20x remove add from tmp      10.920000       8.390000       2.530000
+             Remove block       0.140000       0.130000       0.010000
+
+# Shared libraries Os
+
+#Pliki z małą ilością linii
+                OPERATION      REAL_TIME      USER_TIME    SYSTEM_TIME
+                  Merging       0.420000       0.190000       0.220000
+        Save to tmp files       0.290000       0.080000       0.210000
+  20x remove add from tmp       0.230000       0.150000       0.080000
+             Remove block       0.000000       0.000000       0.000000
+
+#Pliki średnie, ale z dużą ilością tekstu w liniach
+                OPERATION      REAL_TIME      USER_TIME    SYSTEM_TIME
+                  Merging       0.310000       0.100000       0.200000
+        Save to tmp files       0.260000       0.070000       0.190000
+  20x remove add from tmp       5.900000       2.440000       3.450000
+             Remove block       0.010000       0.000000       0.010000
+
+#Pliki z dużą ilością linii
+                OPERATION      REAL_TIME      USER_TIME    SYSTEM_TIME
+                  Merging       0.440000       0.290000       0.140000
+        Save to tmp files       0.240000       0.160000       0.080000
+  20x remove add from tmp      10.970000       8.430000       2.450000
+             Remove block       0.120000       0.110000       0.020000
+
+
+# Dynamic linked libraries O0
+
+#"Pliki z małą ilością linii"
+                OPERATION      REAL_TIME      USER_TIME    SYSTEM_TIME
+                  Merging       0.420000       0.190000       0.210000
+        Save to tmp files       0.280000       0.130000       0.170000
+  20x remove add from tmp       0.240000       0.150000       0.080000
+             Remove block       0.000000       0.000000       0.000000
+
+#Pliki średnie, ale z dużą ilością tekstu w liniach
+                OPERATION      REAL_TIME      USER_TIME    SYSTEM_TIME
+                  Merging       0.310000       0.140000       0.160000
+        Save to tmp files       0.250000       0.060000       0.190000
+  20x remove add from tmp       5.900000       2.510000       3.390000
+             Remove block       0.010000       0.010000       0.010000
+
+#Pliki z dużą ilością linii
+                OPERATION      REAL_TIME      USER_TIME    SYSTEM_TIME
+                  Merging       0.440000       0.320000       0.110000
+        Save to tmp files       0.240000       0.120000       0.120000
+  20x remove add from tmp      10.790000       8.350000       2.420000
+             Remove block       0.120000       0.110000       0.010000
+
+
+# Dynamic linked libraries O1
+
+#"Pliki z małą ilością linii"
+                OPERATION      REAL_TIME      USER_TIME    SYSTEM_TIME
+                  Merging       0.420000       0.150000       0.260000
+        Save to tmp files       0.290000       0.120000       0.170000
+  20x remove add from tmp       0.250000       0.180000       0.060000
+             Remove block       0.000000       0.010000       0.000000
+
+#Pliki średnie, ale z dużą ilością tekstu w liniach
+                OPERATION      REAL_TIME      USER_TIME    SYSTEM_TIME
+                  Merging       0.310000       0.130000       0.170000
+        Save to tmp files       0.250000       0.090000       0.160000
+  20x remove add from tmp       5.970000       2.570000       3.400000
+             Remove block       0.020000       0.010000       0.010000
+
+#Pliki z dużą ilością linii
+                OPERATION      REAL_TIME      USER_TIME    SYSTEM_TIME
+                  Merging       0.450000       0.290000       0.150000
+        Save to tmp files       0.240000       0.160000       0.080000
+  20x remove add from tmp      10.930000       8.350000       2.440000
+             Remove block       0.110000       0.110000       0.010000
+
+
+# Dynamic linked libraries Os
+
+#"Pliki z małą ilością linii"
+                OPERATION      REAL_TIME      USER_TIME    SYSTEM_TIME
+                  Merging       0.420000       0.190000       0.230000
+        Save to tmp files       0.290000       0.100000       0.180000
+  20x remove add from tmp       0.250000       0.150000       0.100000
+             Remove block       0.000000       0.000000       0.000000
+
+#Pliki średnie, ale z dużą ilością tekstu w liniach
+                OPERATION      REAL_TIME      USER_TIME    SYSTEM_TIME
+                  Merging       0.310000       0.140000       0.170000
+        Save to tmp files       0.250000       0.050000       0.200000
+  20x remove add from tmp       5.900000       2.550000       3.340000
+             Remove block       0.010000       0.000000       0.000000
+
+#Pliki z dużą ilością linii
+                OPERATION      REAL_TIME      USER_TIME    SYSTEM_TIME
+                  Merging       0.440000       0.340000       0.100000
+        Save to tmp files       0.240000       0.160000       0.080000
+  20x remove add from tmp      10.800000       8.180000       2.590000
+             Remove block       0.120000       0.110000       0.000000

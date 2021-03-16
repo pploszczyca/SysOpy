@@ -23,8 +23,8 @@ mainDynamic: clean shared
 	gcc mainDynamic.c -o main -L. -Wl,-rpath=`pwd` -lblock_library -ldl
 
 mainTest:
-	#"Pliki z małą ilością linii"
-	./main create_table 14 merge_files $(files) $(files) $(files) $(files) $(files) $(files) $(files) $(files) $(files) $(files) $(files) $(files) $(files) $(files)  remove_block 0
+	#Pliki z małą ilością linii
+	./main create_table 28 merge_files $(files) $(files) $(files) $(files) $(files) $(files) $(files) $(files) $(files) $(files) $(files) $(files) $(files) $(files) $(files) $(files) $(files) $(files) $(files) $(files) $(files) $(files) $(files) $(files) $(files) $(files) $(files) $(files) remove_block 0
 	#Pliki średnie, ale z dużą ilością tekstu w liniach
 	./main create_table 1 merge_files file5.txt:file6.txt remove_block 0
 	#Pliki z dużą ilością linii
@@ -56,3 +56,63 @@ mainStaticOs: clean static
 
 mainTestStaticOs: mainStaticOs
 	make mainTest
+
+mainSharedO0: clean shared
+	gcc main.c -O0 -o main -L. -Wl,-rpath=`pwd` -lblock_library
+
+mainTestSharedO0: mainSharedO0
+	make mainTest
+
+mainSharedO1: clean shared
+	gcc main.c -O1 -o main -L. -Wl,-rpath=`pwd` -lblock_library
+
+mainTestSharedO1: mainSharedO1
+	make mainTest
+
+mainSharedOs: clean shared
+	gcc main.c -Os -o main -L. -Wl,-rpath=`pwd` -lblock_library
+
+mainTestSharedOs: mainSharedOs
+	make mainTest
+
+mainDynamicO0: clean shared
+	gcc mainDynamic.c -O0 -o main -L. -Wl,-rpath=`pwd` -lblock_library -ldl
+
+mainTestDynamicO0: mainDynamicOs
+	make mainTest
+
+mainDynamicO1: clean shared
+	gcc mainDynamic.c -O1 -o main -L. -Wl,-rpath=`pwd` -lblock_library -ldl
+
+mainTestDynamicO1: mainDynamicOs
+	make mainTest
+
+mainDynamicOs: clean shared
+	gcc mainDynamic.c -Os -o main -L. -Wl,-rpath=`pwd` -lblock_library -ldl
+
+mainTestDynamicOs: mainDynamicOs
+	make mainTest
+
+runAllTests:
+	# Static libraries O0
+	make mainTestStaticO0
+	# Static libraries O1
+	make mainTestStaticO1
+	# Static libraries Os
+	make mainTestStaticOs
+	# Shared libraries O0
+	make mainTestSharedO0
+	# Shared libraries O1
+	make mainTestSharedO1
+	# Shared libraries Os
+	make mainTestSharedOs
+	# Dynamic linked libraries O0
+	make mainTestDynamicO0
+	# Dynamic linked libraries O1
+	make mainTestDynamicO1
+	# Dynamic linked libraries Os
+	make mainTestDynamicOs
+
+saveToFileTests:
+	rm -f result3bScores.txt
+	make runAllTests | cat >> result3bScores.txt
