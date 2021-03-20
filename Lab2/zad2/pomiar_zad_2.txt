@@ -1,0 +1,25 @@
+Short-lenght file
+TIMES:
+ LIBRARY: 0.000073
+ SYSTEM: 0.000004
+
+Middle-lenght file
+TIMES:
+ LIBRARY: 0.000643
+ SYSTEM: 0.000008
+
+Long-lenght file
+TIMES:
+ LIBRARY: 0.001574
+ SYSTEM: 0.000010
+
+Long-lenght file with printing every file
+TIMES:
+ LIBRARY: 0.001886
+ SYSTEM: 0.000020
+
+Long-lenght file with priting nothing
+TIMES:
+ LIBRARY: 0.000721
+ SYSTEM: 0.000006
+
