@@ -52,14 +52,14 @@ void printWithLibOpen(char *firstFileName, char *secondFileName){
 
 int printOneLineWithSys(int file){
     char buffer;
-    int isReaded;       // Flaga informująca, czy można dalej czytać z pliku
+    int isRead;       // Flaga informująca, czy można dalej czytać z pliku
 
-    while((isReaded = read(file, &buffer, sizeof(char))) == 1 && buffer != '\n'){
+    while((isRead = read(file, &buffer, sizeof(char))) == 1 && buffer != '\n'){
         printf("%s", &buffer);
     }
 
     printf("\n");
-    return isReaded;
+    return isRead;
 }
 
 int openFileWithSysToRead(char *fileName){
