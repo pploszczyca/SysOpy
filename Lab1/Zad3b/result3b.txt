@@ -117,6 +117,7 @@
   20x remove add from tmp      10.920000       8.390000       2.530000
              Remove block       0.140000       0.130000       0.010000
 
+
 # Shared libraries Os
 
 #Pliki z małą ilością linii
@@ -143,7 +144,7 @@
 
 # Dynamic linked libraries O0
 
-#"Pliki z małą ilością linii"
+#Pliki z małą ilością linii
                 OPERATION      REAL_TIME      USER_TIME    SYSTEM_TIME
                   Merging       0.420000       0.190000       0.210000
         Save to tmp files       0.280000       0.130000       0.170000
@@ -167,7 +168,7 @@
 
 # Dynamic linked libraries O1
 
-#"Pliki z małą ilością linii"
+#Pliki z małą ilością linii
                 OPERATION      REAL_TIME      USER_TIME    SYSTEM_TIME
                   Merging       0.420000       0.150000       0.260000
         Save to tmp files       0.290000       0.120000       0.170000
@@ -191,7 +192,7 @@
 
 # Dynamic linked libraries Os
 
-#"Pliki z małą ilością linii"
+#Pliki z małą ilością linii
                 OPERATION      REAL_TIME      USER_TIME    SYSTEM_TIME
                   Merging       0.420000       0.190000       0.230000
         Save to tmp files       0.290000       0.100000       0.180000
@@ -211,3 +212,6 @@
         Save to tmp files       0.240000       0.160000       0.080000
   20x remove add from tmp      10.800000       8.180000       2.590000
              Remove block       0.120000       0.110000       0.000000
+
+Wnioski:
+  - Przeważnie im większy poziom optymalizacji tym mniejszy czas wykonywania operacji.

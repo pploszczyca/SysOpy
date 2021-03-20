@@ -1,26 +1,27 @@
 files = file1.txt:file2.txt
+CC = gcc -Wall
 
 clean:
 	rm -f *.o
 	rm -f *.so
 
 shared:
-	gcc -c -fpic block_library.c
-	gcc -shared -o libblock_library.so block_library.o
+	$(CC) -c -fpic block_library.c
+	$(CC) -shared -o libblock_library.so block_library.o
 
 static:
-	gcc -c block_library.c
+	$(CC) -c block_library.c
 	ar rcs libblock_library.a block_library.o
-	gcc -c main.c
+	$(CC) -c main.c
 
 mainShared: clean shared
-	gcc main.c -o main -L. -Wl,-rpath=`pwd` -lblock_library
+	$(CC) main.c -o main -L. -Wl,-rpath=`pwd` -lblock_library
 
 mainStatic: clean static
-	gcc main.o -L. -lblock_library  -o main
+	$(CC) main.o -L. -lblock_library  -o main
 
 mainDynamic: clean shared
-	gcc mainDynamic.c -o main -L. -Wl,-rpath=`pwd` -lblock_library -ldl
+	$(CC) mainDynamic.c -o main -L. -Wl,-rpath=`pwd` -lblock_library -ldl
 
 mainTest:
 	#Pliki z małą ilością linii
@@ -40,55 +41,55 @@ mainTestDynamic: mainDynamic
 	make mainTest
 
 mainStaticO0: clean static
-	gcc main.o -O0 -L. -lblock_library  -o main
+	$(CC) main.o -O0 -L. -lblock_library  -o main
 
 mainTestStaticO0: mainStaticO0
 	make mainTest
 
 mainStaticO1: clean static
-	gcc main.o -O1 -L. -lblock_library  -o main
+	$(CC) main.o -O1 -L. -lblock_library  -o main
 
 mainTestStaticO1: mainStaticO1
 	make mainTest
 
 mainStaticOs: clean static
-	gcc main.o -Os -L. -lblock_library  -o main
+	$(CC) main.o -Os -L. -lblock_library  -o main
 
 mainTestStaticOs: mainStaticOs
 	make mainTest
 
 mainSharedO0: clean shared
-	gcc main.c -O0 -o main -L. -Wl,-rpath=`pwd` -lblock_library
+	$(CC) main.c -O0 -o main -L. -Wl,-rpath=`pwd` -lblock_library
 
 mainTestSharedO0: mainSharedO0
 	make mainTest
 
 mainSharedO1: clean shared
-	gcc main.c -O1 -o main -L. -Wl,-rpath=`pwd` -lblock_library
+	$(CC) main.c -O1 -o main -L. -Wl,-rpath=`pwd` -lblock_library
 
 mainTestSharedO1: mainSharedO1
 	make mainTest
 
 mainSharedOs: clean shared
-	gcc main.c -Os -o main -L. -Wl,-rpath=`pwd` -lblock_library
+	$(CC) main.c -Os -o main -L. -Wl,-rpath=`pwd` -lblock_library
 
 mainTestSharedOs: mainSharedOs
 	make mainTest
 
 mainDynamicO0: clean shared
-	gcc mainDynamic.c -O0 -o main -L. -Wl,-rpath=`pwd` -lblock_library -ldl
+	$(CC) mainDynamic.c -O0 -o main -L. -Wl,-rpath=`pwd` -lblock_library -ldl
 
 mainTestDynamicO0: mainDynamicOs
 	make mainTest
 
 mainDynamicO1: clean shared
-	gcc mainDynamic.c -O1 -o main -L. -Wl,-rpath=`pwd` -lblock_library -ldl
+	$(CC) mainDynamic.c -O1 -o main -L. -Wl,-rpath=`pwd` -lblock_library -ldl
 
 mainTestDynamicO1: mainDynamicOs
 	make mainTest
 
 mainDynamicOs: clean shared
-	gcc mainDynamic.c -Os -o main -L. -Wl,-rpath=`pwd` -lblock_library -ldl
+	$(CC) mainDynamic.c -Os -o main -L. -Wl,-rpath=`pwd` -lblock_library -ldl
 
 mainTestDynamicOs: mainDynamicOs
 	make mainTest

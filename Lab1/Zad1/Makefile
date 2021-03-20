@@ -1,18 +1,22 @@
+files = file1.txt:file2.txt
+CC = gcc -Wall
+
+
 clean:
 	rm -f *.o
 	rm -f *.so
 
-mainShared:
-	make clean
-	gcc -fPIC -c block_library.c
-	gcc -shared -fPIC -o libblock_library.so block_library.o
-	gcc main.c -o main -L. -lblock_library -Wl,rpath=`pwd`
+shared:
+	$(CC) -c -fpic block_library.c
+	$(CC) -shared -o libblock_library.so block_library.o
 
-mainStatic:
-	make clean
-	gcc -c block_library.c
+static:
+	$(CC) -c block_library.c
 	ar rcs libblock_library.a block_library.o
-	gcc -c main.c
-	gcc main.o -L. -lblock_library  -o main
+	$(CC) -c main.c
 
+mainShared: clean shared
+	$(CC) main.c -o main -L. -Wl,-rpath=`pwd` -lblock_library
 
+mainStatic: clean static
+	$(CC) main.o -L. -lblock_library  -o main

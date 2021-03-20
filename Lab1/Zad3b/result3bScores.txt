@@ -1,0 +1,261 @@
+make[1]: Entering directory '/home/pepe/Projekty/Semestr4/SysOpy/Lab1/Zad3b'
+# Static libraries O0
+make mainTestStaticO0
+make[2]: Entering directory '/home/pepe/Projekty/Semestr4/SysOpy/Lab1/Zad3b'
+rm -f *.o
+rm -f *.so
+gcc -c block_library.c
+ar rcs libblock_library.a block_library.o
+gcc -c main.c
+gcc main.o -O0 -L. -lblock_library  -o main
+make mainTest
+make[3]: Entering directory '/home/pepe/Projekty/Semestr4/SysOpy/Lab1/Zad3b'
+#Pliki z małą ilością linii
+./main create_table 28 merge_files file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt remove_block 0
+                OPERATION      REAL_TIME      USER_TIME    SYSTEM_TIME
+                  Merging       0.480000       0.160000       0.290000
+        Save to tmp files       0.290000       0.120000       0.170000
+  20x remove add from tmp       0.250000       0.190000       0.060000
+             Remove block       0.000000       0.000000       0.000000
+#Pliki średnie, ale z dużą ilością tekstu w liniach
+./main create_table 1 merge_files file5.txt:file6.txt remove_block 0
+                OPERATION      REAL_TIME      USER_TIME    SYSTEM_TIME
+                  Merging       0.870000       0.120000       0.350000
+        Save to tmp files       0.250000       0.080000       0.170000
+  20x remove add from tmp       6.120000       2.500000       3.590000
+             Remove block       0.020000       0.010000       0.010000
+#Pliki z dużą ilością linii
+./main create_table 1 merge_files file3.txt:file4.txt remove_block 0
+                OPERATION      REAL_TIME      USER_TIME    SYSTEM_TIME
+                  Merging       0.620000       0.290000       0.210000
+        Save to tmp files       0.240000       0.120000       0.120000
+  20x remove add from tmp      10.840000       8.470000       2.350000
+             Remove block       0.130000       0.120000       0.010000
+make[3]: Leaving directory '/home/pepe/Projekty/Semestr4/SysOpy/Lab1/Zad3b'
+make[2]: Leaving directory '/home/pepe/Projekty/Semestr4/SysOpy/Lab1/Zad3b'
+# Static libraries O1
+make mainTestStaticO1
+make[2]: Entering directory '/home/pepe/Projekty/Semestr4/SysOpy/Lab1/Zad3b'
+rm -f *.o
+rm -f *.so
+gcc -c block_library.c
+ar rcs libblock_library.a block_library.o
+gcc -c main.c
+gcc main.o -O1 -L. -lblock_library  -o main
+make mainTest
+make[3]: Entering directory '/home/pepe/Projekty/Semestr4/SysOpy/Lab1/Zad3b'
+#Pliki z małą ilością linii
+./main create_table 28 merge_files file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt remove_block 0
+                OPERATION      REAL_TIME      USER_TIME    SYSTEM_TIME
+                  Merging       0.440000       0.170000       0.250000
+        Save to tmp files       0.280000       0.110000       0.180000
+  20x remove add from tmp       0.240000       0.150000       0.090000
+             Remove block       0.000000       0.000000       0.000000
+#Pliki średnie, ale z dużą ilością tekstu w liniach
+./main create_table 1 merge_files file5.txt:file6.txt remove_block 0
+                OPERATION      REAL_TIME      USER_TIME    SYSTEM_TIME
+                  Merging       0.330000       0.080000       0.240000
+        Save to tmp files       0.250000       0.070000       0.190000
+  20x remove add from tmp       6.000000       2.660000       3.330000
+             Remove block       0.010000       0.010000       0.010000
+#Pliki z dużą ilością linii
+./main create_table 1 merge_files file3.txt:file4.txt remove_block 0
+                OPERATION      REAL_TIME      USER_TIME    SYSTEM_TIME
+                  Merging       0.440000       0.240000       0.180000
+        Save to tmp files       0.240000       0.130000       0.110000
+  20x remove add from tmp      10.910000       8.620000       2.280000
+             Remove block       0.130000       0.130000       0.010000
+make[3]: Leaving directory '/home/pepe/Projekty/Semestr4/SysOpy/Lab1/Zad3b'
+make[2]: Leaving directory '/home/pepe/Projekty/Semestr4/SysOpy/Lab1/Zad3b'
+# Static libraries Os
+make mainTestStaticOs
+make[2]: Entering directory '/home/pepe/Projekty/Semestr4/SysOpy/Lab1/Zad3b'
+rm -f *.o
+rm -f *.so
+gcc -c block_library.c
+ar rcs libblock_library.a block_library.o
+gcc -c main.c
+gcc main.o -Os -L. -lblock_library  -o main
+make mainTest
+make[3]: Entering directory '/home/pepe/Projekty/Semestr4/SysOpy/Lab1/Zad3b'
+#Pliki z małą ilością linii
+./main create_table 28 merge_files file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt remove_block 0
+                OPERATION      REAL_TIME      USER_TIME    SYSTEM_TIME
+                  Merging       0.460000       0.190000       0.250000
+        Save to tmp files       0.280000       0.110000       0.180000
+  20x remove add from tmp       0.240000       0.150000       0.090000
+             Remove block       0.000000       0.000000       0.000000
+#Pliki średnie, ale z dużą ilością tekstu w liniach
+./main create_table 1 merge_files file5.txt:file6.txt remove_block 0
+                OPERATION      REAL_TIME      USER_TIME    SYSTEM_TIME
+                  Merging       0.310000       0.120000       0.190000
+        Save to tmp files       0.250000       0.080000       0.170000
+  20x remove add from tmp       5.840000       2.460000       3.350000
+             Remove block       0.020000       0.010000       0.010000
+#Pliki z dużą ilością linii
+./main create_table 1 merge_files file3.txt:file4.txt remove_block 0
+                OPERATION      REAL_TIME      USER_TIME    SYSTEM_TIME
+                  Merging       0.420000       0.260000       0.150000
+        Save to tmp files       0.240000       0.130000       0.110000
+  20x remove add from tmp      10.500000       7.980000       2.520000
+             Remove block       0.120000       0.120000       0.010000
+make[3]: Leaving directory '/home/pepe/Projekty/Semestr4/SysOpy/Lab1/Zad3b'
+make[2]: Leaving directory '/home/pepe/Projekty/Semestr4/SysOpy/Lab1/Zad3b'
+# Shared libraries O0
+make mainTestSharedO0
+make[2]: Entering directory '/home/pepe/Projekty/Semestr4/SysOpy/Lab1/Zad3b'
+rm -f *.o
+rm -f *.so
+gcc -c -fpic block_library.c
+gcc -shared -o libblock_library.so block_library.o
+gcc main.c -O0 -o main -L. -Wl,-rpath=`pwd` -lblock_library
+make mainTest
+make[3]: Entering directory '/home/pepe/Projekty/Semestr4/SysOpy/Lab1/Zad3b'
+#Pliki z małą ilością linii
+./main create_table 28 merge_files file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt remove_block 0
+                OPERATION      REAL_TIME      USER_TIME    SYSTEM_TIME
+                  Merging       0.420000       0.170000       0.250000
+        Save to tmp files       0.290000       0.130000       0.150000
+  20x remove add from tmp       0.230000       0.170000       0.060000
+             Remove block       0.000000       0.000000       0.010000
+#Pliki średnie, ale z dużą ilością tekstu w liniach
+./main create_table 1 merge_files file5.txt:file6.txt remove_block 0
+                OPERATION      REAL_TIME      USER_TIME    SYSTEM_TIME
+                  Merging       0.320000       0.120000       0.190000
+        Save to tmp files       0.260000       0.070000       0.180000
+  20x remove add from tmp       5.820000       2.670000       3.140000
+             Remove block       0.020000       0.000000       0.010000
+#Pliki z dużą ilością linii
+./main create_table 1 merge_files file3.txt:file4.txt remove_block 0
+                OPERATION      REAL_TIME      USER_TIME    SYSTEM_TIME
+                  Merging       0.420000       0.270000       0.140000
+        Save to tmp files       0.240000       0.130000       0.120000
+  20x remove add from tmp      10.580000       8.170000       2.390000
+             Remove block       0.130000       0.110000       0.010000
+make[3]: Leaving directory '/home/pepe/Projekty/Semestr4/SysOpy/Lab1/Zad3b'
+make[2]: Leaving directory '/home/pepe/Projekty/Semestr4/SysOpy/Lab1/Zad3b'
+# Shared libraries O1
+make mainTestSharedO1
+make[2]: Entering directory '/home/pepe/Projekty/Semestr4/SysOpy/Lab1/Zad3b'
+rm -f *.o
+rm -f *.so
+gcc -c -fpic block_library.c
+gcc -shared -o libblock_library.so block_library.o
+gcc main.c -O1 -o main -L. -Wl,-rpath=`pwd` -lblock_library
+make mainTest
+make[3]: Entering directory '/home/pepe/Projekty/Semestr4/SysOpy/Lab1/Zad3b'
+#Pliki z małą ilością linii
+./main create_table 28 merge_files file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt remove_block 0
+                OPERATION      REAL_TIME      USER_TIME    SYSTEM_TIME
+                  Merging       0.430000       0.180000       0.240000
+        Save to tmp files       0.280000       0.110000       0.160000
+  20x remove add from tmp       0.220000       0.160000       0.070000
+             Remove block       0.000000       0.000000       0.000000
+#Pliki średnie, ale z dużą ilością tekstu w liniach
+./main create_table 1 merge_files file5.txt:file6.txt remove_block 0
+                OPERATION      REAL_TIME      USER_TIME    SYSTEM_TIME
+                  Merging       0.330000       0.150000       0.160000
+        Save to tmp files       0.240000       0.060000       0.180000
+  20x remove add from tmp       5.820000       2.520000       3.280000
+             Remove block       0.010000       0.010000       0.010000
+#Pliki z dużą ilością linii
+./main create_table 1 merge_files file3.txt:file4.txt remove_block 0
+                OPERATION      REAL_TIME      USER_TIME    SYSTEM_TIME
+                  Merging       0.420000       0.290000       0.130000
+        Save to tmp files       0.230000       0.110000       0.120000
+  20x remove add from tmp      10.580000       8.210000       2.350000
+             Remove block       0.130000       0.110000       0.010000
+make[3]: Leaving directory '/home/pepe/Projekty/Semestr4/SysOpy/Lab1/Zad3b'
+make[2]: Leaving directory '/home/pepe/Projekty/Semestr4/SysOpy/Lab1/Zad3b'
+# Shared libraries Os
+make mainTestSharedOs
+make[2]: Entering directory '/home/pepe/Projekty/Semestr4/SysOpy/Lab1/Zad3b'
+rm -f *.o
+rm -f *.so
+gcc -c -fpic block_library.c
+gcc -shared -o libblock_library.so block_library.o
+gcc main.c -Os -o main -L. -Wl,-rpath=`pwd` -lblock_library
+make mainTest
+make[3]: Entering directory '/home/pepe/Projekty/Semestr4/SysOpy/Lab1/Zad3b'
+#Pliki z małą ilością linii
+./main create_table 28 merge_files file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt remove_block 0
+                OPERATION      REAL_TIME      USER_TIME    SYSTEM_TIME
+                  Merging       0.420000       0.190000       0.220000
+        Save to tmp files       0.270000       0.110000       0.170000
+  20x remove add from tmp       0.230000       0.140000       0.090000
+             Remove block       0.000000       0.000000       0.000000
+#Pliki średnie, ale z dużą ilością tekstu w liniach
+./main create_table 1 merge_files file5.txt:file6.txt remove_block 0
+                OPERATION      REAL_TIME      USER_TIME    SYSTEM_TIME
+                  Merging       0.310000       0.110000       0.190000
+        Save to tmp files       0.250000       0.070000       0.180000
+  20x remove add from tmp       5.830000       2.460000       3.360000
+             Remove block       0.010000       0.000000       0.010000
+#Pliki z dużą ilością linii
+./main create_table 1 merge_files file3.txt:file4.txt remove_block 0
+                OPERATION      REAL_TIME      USER_TIME    SYSTEM_TIME
+                  Merging       0.430000       0.260000       0.150000
+        Save to tmp files       0.230000       0.130000       0.100000
+  20x remove add from tmp      10.640000       8.020000       2.570000
+             Remove block       0.130000       0.110000       0.010000
+make[3]: Leaving directory '/home/pepe/Projekty/Semestr4/SysOpy/Lab1/Zad3b'
+make[2]: Leaving directory '/home/pepe/Projekty/Semestr4/SysOpy/Lab1/Zad3b'
+# Dynamic linked libraries O0
+make mainTestDynamicO0
+make[2]: Entering directory '/home/pepe/Projekty/Semestr4/SysOpy/Lab1/Zad3b'
+rm -f *.o
+rm -f *.so
+gcc -c -fpic block_library.c
+gcc -shared -o libblock_library.so block_library.o
+gcc mainDynamic.c -Os -o main -L. -Wl,-rpath=`pwd` -lblock_library -ldl
+make mainTest
+make[3]: Entering directory '/home/pepe/Projekty/Semestr4/SysOpy/Lab1/Zad3b'
+#Pliki z małą ilością linii
+./main create_table 28 merge_files file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt remove_block 0
+                OPERATION      REAL_TIME      USER_TIME    SYSTEM_TIME
+                  Merging       0.430000       0.210000       0.210000
+        Save to tmp files       0.280000       0.110000       0.170000
+  20x remove add from tmp       0.230000       0.150000       0.080000
+             Remove block       0.000000       0.000000       0.000000
+#Pliki średnie, ale z dużą ilością tekstu w liniach
+./main create_table 1 merge_files file5.txt:file6.txt remove_block 0
+                OPERATION      REAL_TIME      USER_TIME    SYSTEM_TIME
+                  Merging       0.310000       0.110000       0.190000
+        Save to tmp files       0.250000       0.040000       0.200000
+  20x remove add from tmp       5.810000       2.290000       3.520000
+             Remove block       0.020000       0.000000       0.010000
+#Pliki z dużą ilością linii
+./main create_table 1 merge_files file3.txt:file4.txt remove_block 0
+                OPERATION      REAL_TIME      USER_TIME    SYSTEM_TIME
+                  Merging       0.440000       0.280000       0.150000
+        Save to tmp files       0.230000       0.110000       0.120000
+  20x remove add from tmp      10.540000       8.160000       2.380000
+             Remove block       0.110000       0.100000       0.010000
+make[3]: Leaving directory '/home/pepe/Projekty/Semestr4/SysOpy/Lab1/Zad3b'
+make[2]: Leaving directory '/home/pepe/Projekty/Semestr4/SysOpy/Lab1/Zad3b'
+# Dynamic linked libraries O1
+make mainTestDynamicO1
+make[2]: Entering directory '/home/pepe/Projekty/Semestr4/SysOpy/Lab1/Zad3b'
+rm -f *.o
+rm -f *.so
+gcc -c -fpic block_library.c
+gcc -shared -o libblock_library.so block_library.o
+gcc mainDynamic.c -Os -o main -L. -Wl,-rpath=`pwd` -lblock_library -ldl
+make mainTest
+make[3]: Entering directory '/home/pepe/Projekty/Semestr4/SysOpy/Lab1/Zad3b'
+#Pliki z małą ilością linii
+./main create_table 28 merge_files file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt file1.txt:file2.txt remove_block 0
+                OPERATION      REAL_TIME      USER_TIME    SYSTEM_TIME
+                  Merging       0.430000       0.200000       0.220000
+        Save to tmp files       0.270000       0.120000       0.150000
+  20x remove add from tmp       0.230000       0.150000       0.080000
+             Remove block       0.000000       0.010000       0.000000
+#Pliki średnie, ale z dużą ilością tekstu w liniach
+./main create_table 1 merge_files file5.txt:file6.txt remove_block 0
+                OPERATION      REAL_TIME      USER_TIME    SYSTEM_TIME
+                  Merging       0.310000       0.120000       0.190000
+        Save to tmp files       0.250000       0.100000       0.140000
+  20x remove add from tmp       5.910000       2.420000       3.480000
+             Remove block       0.010000       0.010000       0.020000
+#Pliki z dużą ilością linii
+./main create_table 1 merge_files file3.txt:file4.txt remove_block 0
