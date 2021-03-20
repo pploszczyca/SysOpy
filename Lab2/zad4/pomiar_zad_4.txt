@@ -1,0 +1,15 @@
+Change one char
+TIMES:
+ LIBRARY: 0.000192
+ SYSTEM: 0.000350
+
+Change short text
+TIMES:
+ LIBRARY: 0.000121
+ SYSTEM: 0.000240
+
+Change in long-text file
+TIMES:
+ LIBRARY: 0.000353
+ SYSTEM: 0.012853
+
