@@ -1,0 +1,15 @@
+Short-lenght file
+TIMES:
+ LIBRARY: 0.000095
+ SYSTEM: 0.000075
+
+Middle-lenght file
+TIMES:
+ LIBRARY: 0.005706
+ SYSTEM: 0.019344
+
+Long-lenght file
+TIMES:
+ LIBRARY: 0.008882
+ SYSTEM: 0.050497
+

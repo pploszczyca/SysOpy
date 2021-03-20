@@ -97,6 +97,12 @@ void printTimes(double libTime, double sysTime){
     printf("TIMES:\n LIBRARY: %f\n SYSTEM: %f\n\n", libTime, sysTime);
 }
 
+void saveTimesToFile(double libTime, double sysTime){
+    FILE *file = fopen("pomiar_zad_1.txt", "a");
+    fprintf(file, "TIMES:\n LIBRARY: %f\n SYSTEM: %f\n\n", libTime, sysTime);
+    fclose(file);
+}
+
 int main(int argc, char *argv[]){
     clock_t startTimeSys, endTimeSys, startTimeLib, endTimeLib;
     char firstFileName[FILE_MAX_NAME_SIZE];
@@ -122,6 +128,7 @@ int main(int argc, char *argv[]){
     endTimeSys = clock();
 
     printTimes(calculateDiffrenceBetweenTimes(startTimeLib, endTimeLib), calculateDiffrenceBetweenTimes(startTimeSys, endTimeSys));
+    saveTimesToFile(calculateDiffrenceBetweenTimes(startTimeLib, endTimeLib), calculateDiffrenceBetweenTimes(startTimeSys, endTimeSys));
 
     return 0;
 }
