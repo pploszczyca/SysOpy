@@ -7,6 +7,8 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 
+#define FILE_MAX_NAME_SIZE 100
+
 // LIB VERSION
 
 int printOneLineWithLib(FILE *file){
@@ -62,7 +64,7 @@ int printOneLineWithSys(int file){
 
 int openFileWithSysToRead(char *fileName){
     int file = open(fileName, O_RDONLY);
-    if(file == NULL){
+    if(file == -1){
         printf("Cann't open %s\n", fileName);
         exit(1);
     }
@@ -97,16 +99,14 @@ void printTimes(double libTime, double sysTime){
 
 int main(int argc, char *argv[]){
     clock_t startTimeSys, endTimeSys, startTimeLib, endTimeLib;
-    char *firstFileName;
-    char *secondFileName;
+    char firstFileName[FILE_MAX_NAME_SIZE];
+    char secondFileName[FILE_MAX_NAME_SIZE];
 
     if(argc == 1){
         scanf("%s\n", firstFileName);
         scanf("%s\n", secondFileName);
     } else if (argc == 3){
-        firstFileName = calloc(strlen(argv[1]), sizeof(char));
         strcpy(firstFileName, argv[1]);
-        secondFileName = calloc(strlen(argv[2]), sizeof(char));
         strcpy(secondFileName, argv[2]);
     } else {
         printf("Bad arguments!\n");
@@ -123,7 +123,5 @@ int main(int argc, char *argv[]){
 
     printTimes(calculateDiffrenceBetweenTimes(startTimeLib, endTimeLib), calculateDiffrenceBetweenTimes(startTimeSys, endTimeSys));
 
-    free(firstFileName);
-    free(secondFileName);
     return 0;
 }
