@@ -44,3 +44,6 @@
 
 #Test files
 file*.txt
+
+#Main file
+main
