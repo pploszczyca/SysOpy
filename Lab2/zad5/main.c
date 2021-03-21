@@ -9,6 +9,17 @@
 
 #define LINE_LIMIT 50
 
+int findPositionOfLastNewLine(char *buffer, int lastElement){
+    int i;
+    for(i = lastElement; i >= 0; i--){
+        if(buffer[i] == '\n'){
+            break;
+        }
+    }
+
+    return i;
+}
+
 // LIB VERSION
 
 FILE *openFileWithLib(char *fileName, char *options){
@@ -32,19 +43,25 @@ FILE *openFileWithLibToWrite(char *fileName){
 void brakeLineInFileLib(char *fileToReadName, char *fileToSaveName){
     FILE *fileToRead = openFileWithLibToRead(fileToReadName);
     FILE *fileToSave = openFileWithLibToWrite(fileToSaveName);
-    char buffer[1];
-    int i = 0;
+    char buffer[LINE_LIMIT];
+    int lineToRead = LINE_LIMIT;
+    int lastNewLinePos;
+    int readLines;
 
-    while(fread(&buffer, sizeof(char), 1, fileToRead)){
-        fwrite(buffer, sizeof(char), 1, fileToSave);
-        i++;
+    strcpy(buffer, "");
 
-        if(i > LINE_LIMIT){
-            fwrite("\n", sizeof(char), strlen("\n"), fileToSave);
-            i = 0;
+    while((readLines = fread(&buffer, sizeof(char), lineToRead, fileToRead)) > 0){
+        fwrite(buffer, sizeof(char), readLines, fileToSave);
+
+        lastNewLinePos = findPositionOfLastNewLine(buffer, readLines);
+        if(lastNewLinePos == -1){
+            fwrite("\n", sizeof(char), 1, fileToSave);
+            lineToRead = LINE_LIMIT;
+        } else {
+            lineToRead = LINE_LIMIT - readLines + lastNewLinePos +1;
         }
 
-        if(buffer[0] == '\n')  i = 0;
+        strcpy(buffer, "");
     }
 
     fclose(fileToRead);
@@ -71,27 +88,30 @@ int openFileWithSysToWrite(char *fileName){
 void brakeLineInFileSys(char *fileToReadName, char *fileToSaveName){
     int fileToRead = openFileWithSysToRead(fileToReadName);
     int fileToSave = openFileWithSysToWrite(fileToSaveName);
-    char buffer[1];
-    int i = 0;
+    char buffer[LINE_LIMIT];
+    int lineToRead = LINE_LIMIT;
+    int lastNewLinePos;
+    int readLines;
 
-    while(read(fileToRead, &buffer, sizeof(char))){
-        write(fileToSave, buffer, strlen(buffer));
-        i++;
+    strcpy(buffer, "");
 
-        if(i > LINE_LIMIT){
-            write(fileToSave, "\n",1);
-            i = 0;
+    while((readLines = read(fileToRead, &buffer, lineToRead)) > 0){
+        write(fileToSave, buffer, readLines);
+
+        lastNewLinePos = findPositionOfLastNewLine(buffer, readLines);
+        if(lastNewLinePos == -1){
+            write(fileToSave, "\n", 1);
+            lineToRead = LINE_LIMIT;
+        } else {
+            lineToRead = LINE_LIMIT - readLines + lastNewLinePos +1;
         }
 
-        if(buffer[0] == '\n')  i = 0;
+        strcpy(buffer, "");
     }
 
     close(fileToRead);
     close(fileToSave);
 }
-
-
-
 
 // MAIN
 
