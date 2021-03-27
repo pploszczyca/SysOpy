@@ -1,0 +1,11 @@
+#Pliki z małą ilością linii
+                OPERATION      REAL_TIME      USER_TIME    SYSTEM_TIME
+                  Merging       0.120000       0.000000       0.000000
+
+#Pliki średnie, ale z dużą ilością tekstu w liniach
+                OPERATION      REAL_TIME      USER_TIME    SYSTEM_TIME
+                  Merging       0.330000       0.000000       0.000000
+
+#Pliki z dużą ilością linii
+                OPERATION      REAL_TIME      USER_TIME    SYSTEM_TIME
+                  Merging       0.490000       0.000000       0.000000
