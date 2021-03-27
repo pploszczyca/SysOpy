@@ -16,10 +16,11 @@ int main(int argc, int *argv[]) {
     for(int i = 0; i < nOfProcess; i++){
         child_pid = fork();
         if(child_pid == 0){
-            printf("Ten napis pochodzi z procesu: %d\n", child_pid);
+            printf("Ten napis pochodzi z procesu: %d\n", (int) getppid());
             break;
         }
     }
-    
+
+    while(wait(NULL) > 0);
     return 0;
 }
