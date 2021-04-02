@@ -39,39 +39,34 @@ int checkIfContainsName(char *fileName, char* fileNameToFind){
     return 0;
 }
 
-void checkDirectors(char *directorName, char *fileNameToFind ,int depth, char *relativePath){
+void checkDirectors(char *relativePath, char *fileNameToFind ,int depth){
     if(depth == 0){
         return;
     }
 
-    DIR* currentDir = opendir(directorName);
+    DIR* currentDir = opendir(relativePath);
     struct dirent* directorStructure;
     struct stat path_stat;
     int parentPid;
-
-    strcat(relativePath, directorName);
-    strcat(relativePath, "/");
-
-    // printf("PID: %d - %s\n",(int) getpid(),relativePath);
+    
+    parentPid = (int) getpid();
 
     while( (directorStructure = readdir(currentDir)) != NULL){
         stat(directorStructure->d_name, &path_stat);
 
-        // printf("%s\n", directorStructure->d_name);
-
-        parentPid = (int) getpid();
-
-        if(S_ISDIR(path_stat.st_mode)==0 && strcmp(directorStructure->d_name, ".") != 0 && strcmp(directorStructure->d_name, "..") != 0){
+        if(S_ISDIR(path_stat.st_mode) && strcmp(directorStructure->d_name, ".") != 0 && strcmp(directorStructure->d_name, "..") != 0){
             fork();
-            printf("%s\n", directorStructure->d_name);
+            
             if((int) getpid() != parentPid){
-                checkDirectors(directorStructure->d_name, fileNameToFind ,depth-1, relativePath);
+                strcat(relativePath, directorStructure->d_name);
+                strcat(relativePath, "/");
+                checkDirectors(relativePath, fileNameToFind ,depth-1);
                 break;
             }
         }
 
         if(checkIfTxt(directorStructure->d_name) && checkIfContainsName(directorStructure->d_name, fileNameToFind)){
-            printf("%s%s  PID: %d\n", relativePath, directorStructure->d_name, (int) getpid());
+            printf("%s%s  PID: %d\n", relativePath, directorStructure->d_name, parentPid);
         }
     }
 
@@ -79,11 +74,9 @@ void checkDirectors(char *directorName, char *fileNameToFind ,int depth, char *r
 }
 
 int main(int argc, int *argv[]){
-    char *startCatalog, *fileNameToFind;
+    char *fileNameToFind;
     int maxDepth;
     char relativePath[MAX_PATH_NAME];
-
-    strcpy(relativePath, "");
 
     if(argc != 4){
         printf("Bad arguments\n");
@@ -92,11 +85,12 @@ int main(int argc, int *argv[]){
 
     printf("PID: %d\n",(int) getpid());
 
-    startCatalog = argv[1];
+    strcpy(relativePath, argv[1]);
+    strcat(relativePath, "/");
     fileNameToFind = argv[2];
     maxDepth = atoi(argv[3]);
 
-    checkDirectors(startCatalog, fileNameToFind, maxDepth, relativePath);
+    checkDirectors(relativePath, fileNameToFind, maxDepth);
 
     while(wait(NULL) > 0);
     return 0;
