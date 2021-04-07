@@ -22,6 +22,18 @@ void maskSignal(){
         perror("Can't block the signal");
 }
 
+void checkIfSignalIsInMask(){
+    sigset_t pendingMask;
+
+    sigpending(&pendingMask);
+
+    if(sigismember(&pendingMask, SIGUSR1) == 1){
+        printf("SIGUSR1 is in mask\n");
+    } else {
+        printf("SIGUSR1 is NOT in mask\n");
+    }
+}
+
 int main(int argc, char *argv[]){
     pid_t child_pid;
 
@@ -38,33 +50,26 @@ int main(int argc, char *argv[]){
             printf("Can't catch SIGUSR1!\n");
         }
     }
-    else if (strcmp(argv[1], "mask") == 0){
-        maskSignal();
-    }
-    else if (strcmp(argv[1], "pending") == 0){
+    else if (strcmp(argv[1], "mask") == 0 || strcmp(argv[1], "pending") == 0){
         maskSignal();
     }
 
     raise(SIGUSR1);
 
+    if(strcmp(argv[1], "pending") == 0){
+        checkIfSignalIsInMask();
+    }
+
+
     child_pid = fork();
     if(child_pid == 0 && strcmp(argv[1], "pending") != 0){
         raise(SIGUSR1);
     } else if (child_pid == 0 && strcmp(argv[1], "pending") == 0){
-        sigset_t pendingMask;
-
-        sigpending(&pendingMask);
-
-        if(sigismember(&pendingMask, SIGUSR1) == 1){
-            printf("SIGUSR1 is in mask\n");
-        } else {
-            printf("SIGUSR1 is NOT in mask\n");
-        }
+        checkIfSignalIsInMask();
+    } else if (strcmp(argv[1], "handler") == 0) {
+        execl("./execMain", "execMain", argv[1]);
     }
     
-    // printf("PID: %d\n", (int) getpid());
-
-    // for(;;);
 
     while(wait(NULL) > 0);
     return 0;

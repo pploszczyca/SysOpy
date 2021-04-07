@@ -2,16 +2,25 @@ CC = gcc
 CFLAGS = -Wall
 
 mainCompile:
-	$(CC) $(CFLAGS) main.c -o main 
+	$(CC) $(CFLAGS) main.c -o main
 
-handler: mainCompile
+execMainCompile:
+	$(CC) $(CFLAGS) execMain.c -o execMain
+
+handler: mainCompile execMainCompile
 	./main handler
 
-ignore: mainCompile
+ignore: mainCompile execMainCompile
 	./main ignore
 
-mask: mainCompile
+mask: mainCompile execMainCompile
 	./main mask
 
-pending: mainCompile
+pending: mainCompile execMainCompile
 	./main pending
+
+test:
+	make handler
+	make ignore
+	make mask
+	make pending

@@ -1,0 +1,7 @@
+Pierwsza część zadania:
+    - Dla "ignore", "handler", "mask" sygnały są blokowane/obsługiwane zarówno przez proces macierzysty i potomny
+    - Dla "pending" proces macierzysty widzi sygnał maskowany, natomiast potomek już nie.
+
+Druga część zadania (exec):
+    - Dla opcji "ignore", "mask" sygnał jest maskowany/ignorowany dla programu uruchamianego przez exec.
+    - Dla opcji "pending" sygnał jest widoczny w programie uruchomionym przez exec
