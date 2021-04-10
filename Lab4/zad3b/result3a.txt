@@ -1,0 +1,13 @@
+Wysłane 50000 sygnałów.
+
+KILL
+    - Otrzymanych przez CATCHER: 43297
+    - Otrzymanych przez SENDER: 26609
+
+SIGQUEUE
+    - Otrzymanych przez CATCHER: 49478
+    - Otrzymanych przez SENDER: 49446
+
+SIGRT (Sygnały SIGRTMIN+10; SIGRTMIN+15)
+    - Otrzymanych przez CATCHER: 50000
+    - Otrzymanych przez SENDER: 17541
