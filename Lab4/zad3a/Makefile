@@ -1,0 +1,18 @@
+CC = gcc
+CFLAGS = -Wall
+CATCHER_PID = 0
+SIGNAL_TYPE = KILL
+CATCHER_PID = 0
+SIGNAL_AMMOUNT = 50000
+
+catcherCompile:
+	$(CC) $(CFLAGS) catcher.c -o catcher
+
+senderCompile:
+	$(CC) $(CFLAGS) sender.c -o sender
+
+runCatcher: catcherCompile senderCompile
+	./catcher $(SIGNAL_TYPE)
+
+runSender:
+	./sender $(CATCHER_PID) $(SIGNAL_AMMOUNT) $(SIGNAL_TYPE)
