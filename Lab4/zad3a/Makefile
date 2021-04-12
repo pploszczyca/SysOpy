@@ -1,9 +1,8 @@
 CC = gcc
 CFLAGS = -Wall
-CATCHER_PID = 0
 SIGNAL_TYPE = KILL
-CATCHER_PID = 0
 SIGNAL_AMMOUNT = 50000
+CATCHER_PID = 0
 
 catcherCompile:
 	$(CC) $(CFLAGS) catcher.c -o catcher
