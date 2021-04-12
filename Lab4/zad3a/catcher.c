@@ -15,13 +15,9 @@ int main(int argc, char *argv[]){
 
     printf("%d\n", (int) getpid());
 
-    signal(startSignal, handleSignal);
-
     setMasksAndHandlers(startSignal, endSignal, &mask);
 
-    while(HANDLE_SIGNALS == 1){
-        sigsuspend(&mask);
-    }
+    while(HANDLE_SIGNALS == 1);
 
     printf("Number of received signals: %d\n", countSignals);
     

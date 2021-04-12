@@ -41,7 +41,7 @@ void setStartEndSignal(int *startSignal, int *endSignal){
         *startSignal = SIGRTMIN+10;
         *endSignal = SIGRTMIN+15;
     } else {    
-
+        *startSignal = SIGUSR1;
         *endSignal = SIGUSR2;
     }
 }
@@ -58,6 +58,8 @@ void chooseSignalMethod(int catcherPID, int nOfSignals){
 
 void setMasksAndHandlers(int startSignal, int endSignal, sigset_t *mask){
     struct sigaction endAction;
+
+    signal(startSignal, handleSignal);
 
     endAction.sa_sigaction = endSignalHandler;
     sigemptyset(&endAction.sa_mask);

@@ -10,8 +10,8 @@ catcherCompile:
 senderCompile:
 	$(CC) $(CFLAGS) sender.c -o sender
 
-runCatcher: catcherCompile senderCompile
+runCatcher: catcherCompile
 	./catcher $(SIGNAL_TYPE)
 
-runSender:
+runSender: senderCompile
 	./sender $(CATCHER_PID) $(SIGNAL_AMMOUNT) $(SIGNAL_TYPE)

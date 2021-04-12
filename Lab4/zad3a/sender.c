@@ -24,15 +24,11 @@ int main(int argc, char *argv[]){
 
     setStartEndSignal(&startSignal, &endSignal);
 
-    signal(startSignal, handleSignal);
-
     setMasksAndHandlers(startSignal, endSignal, &mask);
     
     chooseSignalMethod(catcherPID, nOfSignals);
 
-    while(HANDLE_SIGNALS == 1){
-        sigsuspend(&mask);
-    }
+    while(HANDLE_SIGNALS == 1);
 
     return 0;
 }
