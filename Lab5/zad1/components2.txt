@@ -1,0 +1,5 @@
+skl1 = echo test1
+skl2 = echo test2
+
+skl1
+skl2
