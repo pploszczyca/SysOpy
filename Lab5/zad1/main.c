@@ -53,62 +53,43 @@ component * findComponentInArray(char *nameToFind, component **componentsArray, 
     return NULL;
 }
 
-void clearArray(char commandArguments[MAX_ARGUMENTS_AMMOUNT][NAME_MAX_SIZE], int n){
-    for(int i = 0; i < n; i++){
-        strcpy(commandArguments[i], "");
-    }
-}
-
 void runComponents(component **componentsArray, int nOfComponents, FILE *fileWithComponents){
     char streamsBuffer[COMMAND_MAX_SIZE];
+    char bufferOfResult[COMMAND_MAX_SIZE];
     char *nameBuffer;
-    char commandName[COMMAND_MAX_SIZE];
-    char commandArguments[MAX_ARGUMENTS_AMMOUNT][NAME_MAX_SIZE];
-    char *argumentBuffer;
     component *tmpComponent;
     int fd[2];
     int i = 0;
     pid_t childPid;
 
+    
+
     while(fscanf(fileWithComponents, "%[^\n]\n", streamsBuffer) != EOF){
         if(fork() == 0){
-            pipe(fd);
+            strcpy(bufferOfResult, "");
 
             nameBuffer = strtok(streamsBuffer, " | ");
             while(nameBuffer != NULL){
+                pipe(fd);
                 tmpComponent = findComponentInArray(nameBuffer, componentsArray, nOfComponents);
-                argumentBuffer = strtok(tmpComponent->command, " ");
 
-                while(argumentBuffer != NULL){
-                    clearArray(commandArguments, i);
-                    strcpy(commandName, argumentBuffer);
-                    // printf("%s\n", commandName);
-                    strcpy(commandArguments[0], commandName);
+                childPid = fork();
+
+                if(childPid == 0){
+                    close(fd[1]);
+                    dup2(fd[0], STDIN_FILENO);                    
+                } else {
                     
-                    argumentBuffer = strtok(NULL, " ");
-                    for(i = 1; argumentBuffer != NULL && strcmp(argumentBuffer, "|") != 0; i++){
-                        strcpy(commandArguments[i], argumentBuffer);
-                        // printf("  %s\n", commandArguments[i]);
-                        argumentBuffer = strtok(NULL, " ");
-                    }
-
-                    if((childPid = fork()) == 0){
-                        close(fd[1]);
-                        dup2(fd[0], STDIN_FILENO);
-
-                    } else {
-                        close(fd[0]);
-                        
-                        execvp(commandName, commandArguments);
-                        break;
-                    }
-
-                    argumentBuffer = strtok(NULL, " ");
-                }
-
-                if(childPid != 0){
+                    close(fd[0]);
+                    execl("/bin/sh", "/bin/sh", "-c", tmpComponent->command, (char *) NULL);
+                    
+                    
                     break;
                 }
+                
+                int status;
+
+                waitpid(-1, &status, 0);
 
                 nameBuffer = strtok(NULL, " | ");
             }

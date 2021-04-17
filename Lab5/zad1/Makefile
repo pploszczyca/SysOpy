@@ -5,4 +5,7 @@ mainCompile:
 	$(CC) $(CFLAGS) main.c -o main
 
 main: mainCompile
-	./main components2.txt 2
+	./main components2.txt 3
+
+test: mainCompile
+	./main components.txt 3
