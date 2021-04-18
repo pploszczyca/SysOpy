@@ -7,7 +7,6 @@
 
 #define NAME_MAX_SIZE 100
 #define COMMAND_MAX_SIZE 1000
-#define MAX_ARGUMENTS_AMMOUNT 100
 
 typedef struct component {
     char name[NAME_MAX_SIZE];
@@ -25,8 +24,6 @@ component ** initializeComponentsArray(int nOfComponents){
 
 void freeComponentsArray(component **componentsArray, int nOfComponents){
     for(int i = 0; i < nOfComponents; i++){
-        // free(componentsArray[i]->name);
-        // free(componentsArray[i]->command);
         free(componentsArray[i]);
     }
 }
@@ -58,44 +55,39 @@ void runComponents(component **componentsArray, int nOfComponents, FILE *fileWit
     char bufferOfResult[COMMAND_MAX_SIZE];
     char *nameBuffer;
     component *tmpComponent;
-    int fd[2];
+    int fd[2], fdPrevious[2] = {-1, -1};
     int i = 0;
     pid_t childPid;
 
-    
-
     while(fscanf(fileWithComponents, "%[^\n]\n", streamsBuffer) != EOF){
-        if(fork() == 0){
-            strcpy(bufferOfResult, "");
+        strcpy(bufferOfResult, "");
 
-            nameBuffer = strtok(streamsBuffer, " | ");
-            while(nameBuffer != NULL){
-                pipe(fd);
-                tmpComponent = findComponentInArray(nameBuffer, componentsArray, nOfComponents);
+        nameBuffer = strtok(streamsBuffer, " | ");
+        while(nameBuffer != NULL){
+            pipe(fd);
+            tmpComponent = findComponentInArray(nameBuffer, componentsArray, nOfComponents);
 
-                childPid = fork();
+            nameBuffer = strtok(NULL, " | ");
 
-                if(childPid == 0){
-                    close(fd[1]);
-                    dup2(fd[0], STDIN_FILENO);                    
-                } else {
-                    
+            childPid = fork();
+
+            if(childPid == 0){
+                close(fdPrevious[1]);
+                dup2(fdPrevious[0], STDIN_FILENO);
+
+                if(nameBuffer != NULL){
                     close(fd[0]);
-                    execl("/bin/sh", "/bin/sh", "-c", tmpComponent->command, (char *) NULL);
-                    
-                    
-                    break;
+                    dup2(fd[1], STDOUT_FILENO);
                 }
                 
-                int status;
-
-                waitpid(-1, &status, 0);
-
-                nameBuffer = strtok(NULL, " | ");
-            }
-
-            break;
+                execl("/bin/sh", "/bin/sh", "-c", tmpComponent->command, (char *) NULL);
+            } 
+                
+            close(fd[1]);
+            fdPrevious[0] = fd[0];
+            fdPrevious[1] = fd[1];
         }
+
         while(wait(NULL) > 0);
     }
 }
