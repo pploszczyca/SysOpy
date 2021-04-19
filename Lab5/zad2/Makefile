@@ -9,3 +9,4 @@ testSend: mainCompile
 
 testPrintEmail: mainCompile
 	./main nadawca
+	./main data

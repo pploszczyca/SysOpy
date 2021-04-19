@@ -8,15 +8,18 @@
 #define MAX_BUFFER_SIZE 1000
 
 void printEmailAdresses(char *typeOfPrint){
-    char buffer[MAX_BUFFER_SIZE];
-    strcpy(buffer, "");
-    if(strcmp(typeOfPrint, "nadawca") == 0){
-        FILE *mail = popen("mail -p | grep From: | grep -o [a-z,A-Z]*@[a-z,A-Z,.]* | sort", "r");
+    char buffer[MAX_BUFFER_SIZE] = "";
+    char commandBuffer[MAX_BUFFER_SIZE] = "mail -p | grep From: | grep -o [a-z,A-Z,.]*@[a-z,A-Z,.]*";
+    FILE *mail;
+    if(strcmp(typeOfPrint, "nadawca") == 0 || strcmp(typeOfPrint, "data") == 0){
+        if(strcmp(typeOfPrint, "nadawca") == 0 ){
+            strcat(commandBuffer, " | sort");
+        }
+
+        mail = popen(commandBuffer, "r");
         fread(buffer, sizeof(char), MAX_BUFFER_SIZE, mail);
         printf("%s\n", buffer);
         pclose(mail);
-    } else if (strcmp(typeOfPrint, "data") == 0) {
-        
     }
 }
 
@@ -27,7 +30,6 @@ void sendEmail(char *adresEmail, char *title, char *content){
     fputs(content, mail);
     pclose(mail);
 }
-
 
 int main(int argc, char *argv[]){
     if(!(argc == 2 || argc == 4)){
