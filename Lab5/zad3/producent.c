@@ -8,10 +8,8 @@
 #include <time.h>
 #include <fcntl.h>
 
-#define MAX_LINE_BUFFER_SIZE 1000
-
 int main(int argc, char *argv[]){
-    char *fifoPath, *pathToFileToRead, *buffer, lineBuffer[MAX_LINE_BUFFER_SIZE];
+    char *fifoPath, *pathToFileToRead, *buffer, *lineBuffer;
     int lineID, n;        // n - amount of chars read in one moment
     FILE *fileToRead, *fifoFile;
 
@@ -26,29 +24,29 @@ int main(int argc, char *argv[]){
     lineID = atoi(argv[2]);
     pathToFileToRead = argv[3];
     n = atoi(argv[4]);
-    buffer = calloc(n+10, sizeof(char));
-
+    buffer = calloc(n, sizeof(char));
+    lineBuffer = calloc(n+20, sizeof(char));
 
     fifoFile = fopen(fifoPath, "w+");
 
     if(fifoFile == NULL){
-        printf("Can't open fifo file\n");
+        printf("Producent: Can't open fifo file\n");
         exit(1);
     }
 
     if((fileToRead = fopen(pathToFileToRead, "r")) == NULL){
-        printf("Can't open file to read\n");
+        printf("Producent: Can't open file to read\n");
         exit(1);
     }
 
-    fprintf(fifoFile, "%d ", n);
-
     while(fread(buffer, sizeof(char), n, fileToRead) != NULL){
-        // sleep(rand()%3+1);
-        fwrite(buffer, sizeof(char) ,n, fifoFile);
+        sleep(rand()%1+1);
+        sprintf(lineBuffer, "%d %s\n", lineID, buffer);
+        fputs(lineBuffer, fifoFile);
     }
 
     free(buffer);
+    free(lineBuffer);
     fclose(fifoFile);
     fclose(fileToRead);
     return 0;
