@@ -5,6 +5,7 @@
 #include <string.h>
 
 #define MAX_MESSAGE_SIZE 512
+#define QUEUE_PERMISSIONS 0660
 
 // Message types
 #define STOP 6
@@ -14,9 +15,14 @@
 #define INIT 10
 
 // Structure for sending messages
+typedef struct message_text{
+    int queue_id;
+    char mtext[MAX_MESSAGE_SIZE];
+} message_text;
+
 typedef struct msgbuf {
     long mtype;
-    char mtext[MAX_MESSAGE_SIZE];
+    message_text message_text;
 } msgbuf;
 
 #define SERVER_KEY_NUMBER 0
