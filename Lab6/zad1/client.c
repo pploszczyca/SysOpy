@@ -1,19 +1,13 @@
 #include "common.h"
 
 int convertType(char *stringType){
-    if(strcmp(stringType, "STOP\n") == 0) {
-        return STOP;
-    } else if (strcmp(stringType, "DISCONNECT\n") == 0){
-        return DISCONNECT;
-    } else if (strcmp(stringType, "LIST\n") == 0){
-        return LIST;
-    } else if (strcmp(stringType, "CONNECT\n") == 0){
-        return CONNECT;
-    } else if (strcmp(stringType, "INIT\n") == 0){
-        return INIT;
-    }
+    if(strcmp(stringType, "STOP") == 0) return STOP;
+    else if (strcmp(stringType, "DISCONNECT") == 0) return DISCONNECT;
+    else if (strcmp(stringType, "LIST") == 0)   return LIST;
+    else if (strcmp(stringType, "CONNECT") == 0)    return CONNECT;
+    else if (strcmp(stringType, "INIT") == 0)   return INIT;
 
-    return -1;
+    return 0;
 }
 
 int sendInitToServer(int serverID, int clientID){
@@ -24,7 +18,7 @@ int sendInitToServer(int serverID, int clientID){
 
     msgsnd(serverID, &buffer, sizeof(message_text), 0);
 
-    if(msgrcv(serverID, &received_message, sizeof(message_text), 0, 0) == -1){
+    if(msgrcv(clientID, &received_message, sizeof(message_text), 0, 0) == -1){
         printf("Reading error\n");
         exit(1);
     }
@@ -34,9 +28,9 @@ int sendInitToServer(int serverID, int clientID){
 
 int main(int argc, char *argv[]){
     key_t serverKey = ftok(PATH_TO_GENERATE_KEY, SERVER_KEY_NUMBER);
-    int serverID, clientID, clientID_from_server;
-    char buffer[MAX_MESSAGE_SIZE];
-    msgbuf message, received_message;
+    int serverID, clientID, clientID_from_server, current_queue, chat_mode = 0;
+    char buffer[MAX_MESSAGE_SIZE], command_buffer[MAX_MESSAGE_SIZE], client_to_connect_ID[MAX_MESSAGE_SIZE];
+    msgbuf message, received_message, client_message;
 
     if((clientID = msgget(IPC_PRIVATE, QUEUE_PERMISSIONS)) == -1){
         printf("Queue client error\n");
@@ -50,36 +44,63 @@ int main(int argc, char *argv[]){
 
     clientID_from_server = sendInitToServer(serverID, clientID);
 
-    printf("%d\n", clientID_from_server);
+    current_queue = serverID;
+
+    printf("QUEUE NUMBER: %d | ID FROM SERVER: %d\n", clientID, clientID_from_server);
 
     while(1){
         strcpy(buffer, "");
+        strcpy(command_buffer, "");
+        printf("You: ");
         fgets(buffer, MAX_MESSAGE_SIZE, stdin);
-        message.mtype = convertType(buffer);
 
-        if(message.mtype == -1){
-            printf("Bad command!\n");
+        if(chat_mode == 0 && msgrcv(clientID, &client_message, sizeof(message_text), 0, IPC_NOWAIT) != -1 && client_message.mtype == CONNECT){
+            printf("CONNECTED\n");
+            current_queue = atoi(client_message.message_text.mtext);
+            chat_mode = 1;
+
+            waitForMessage(clientID, &received_message);
+            printf("CLIENT %d: %s",received_message.message_text.queue_id ,received_message.message_text.mtext);
+
             continue;
         }
 
         message.message_text.queue_id = clientID_from_server;
-        
-        msgsnd(serverID, &message, sizeof(message_text), 0);
 
-        if(message.mtype == DISCONNECT){
-            break;
+        if(chat_mode == 0){
+            sscanf(buffer, "%s %s\n", command_buffer, message.message_text.mtext);
+            message.mtype = convertType(command_buffer);
+
+            if(message.mtype == 0 && chat_mode == 0){
+                printf("Bad command!\n");
+                continue;
+            }
+            
+            msgsnd(current_queue, &message, sizeof(message_text), 0);
+
+            if(message.mtype == DISCONNECT){
+                break;
+            }
+
+            waitForMessage(clientID, &received_message);
+
+            if(received_message.mtype == CONNECT){
+                chat_mode = 1;
+                current_queue = atoi(received_message.message_text.mtext);
+                printf("CONNECTED\n");
+            } else {
+                printf("%s\n", received_message.message_text.mtext);
+            }
+        } else {
+            strcpy(message.message_text.mtext, buffer);
+            message.mtype = MESSAGE;
+            msgsnd(current_queue, &message, sizeof(message_text), 0);
+
+            waitForMessage(clientID, &received_message);
+            printf("CLIENT %d: %s",received_message.message_text.queue_id ,received_message.message_text.mtext);
         }
-
-        if(msgrcv(serverID, &received_message, sizeof(message_text), 0, 0) == -1){
-            printf("Reading error\n");
-            continue;
-        }
-
-        printf("%s\n", received_message.message_text.mtext);
     }
 
-
     msgctl(clientID, IPC_RMID, NULL);
-
     return 0;
 }
