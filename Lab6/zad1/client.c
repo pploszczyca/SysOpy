@@ -2,7 +2,7 @@
 
 int convertType(char *stringType){
     if(strcmp(stringType, "STOP") == 0) return STOP;
-    else if (strcmp(stringType, "DISCONNECT") == 0) return DISCONNECT;
+    else if (strcmp(stringType, "DISCONNECT\n") == 0) return DISCONNECT;
     else if (strcmp(stringType, "LIST") == 0)   return LIST;
     else if (strcmp(stringType, "CONNECT") == 0)    return CONNECT;
     else if (strcmp(stringType, "INIT") == 0)   return INIT;
@@ -24,6 +24,22 @@ int sendInitToServer(int serverID, int clientID){
     }
 
     return received_message.message_text.queue_id;
+}
+
+int checkDisconnectFromChat(char *buffer, int *chat_mode, int *current_queue, msgbuf *message, int serverID, int clientID_from_server){
+    if(convertType(buffer) == DISCONNECT){
+        printf("DISCONNECTED FROM CHAT!\n\n");
+        (*chat_mode) = 0;
+        (*current_queue) = serverID;
+
+        message->mtype = DISCONNECT;
+        message->message_text.queue_id = clientID_from_server;
+        msgsnd(serverID, message, sizeof(message_text), 0);       
+
+        return 0;
+    }
+
+    return -1;
 }
 
 int main(int argc, char *argv[]){
@@ -55,11 +71,14 @@ int main(int argc, char *argv[]){
         fgets(buffer, MAX_MESSAGE_SIZE, stdin);
 
         if(chat_mode == 0 && msgrcv(clientID, &client_message, sizeof(message_text), 0, IPC_NOWAIT) != -1 && client_message.mtype == CONNECT){
-            printf("CONNECTED\n");
+            printf("CONNECTED TO CHAT\n");
             current_queue = atoi(client_message.message_text.mtext);
             chat_mode = 1;
 
             waitForMessage(clientID, &received_message);
+
+            if(checkDisconnectFromChat(received_message.message_text.mtext, &chat_mode, &current_queue, &message, serverID, clientID_from_server) == 0) continue;
+
             printf("CLIENT %d: %s",received_message.message_text.queue_id ,received_message.message_text.mtext);
 
             continue;
@@ -78,7 +97,7 @@ int main(int argc, char *argv[]){
             
             msgsnd(current_queue, &message, sizeof(message_text), 0);
 
-            if(message.mtype == DISCONNECT){
+            if(message.mtype == STOP){
                 break;
             }
 
@@ -87,7 +106,7 @@ int main(int argc, char *argv[]){
             if(received_message.mtype == CONNECT){
                 chat_mode = 1;
                 current_queue = atoi(received_message.message_text.mtext);
-                printf("CONNECTED\n");
+                printf("CONNECTED TO CHAT\n");
             } else {
                 printf("%s\n", received_message.message_text.mtext);
             }
@@ -96,7 +115,12 @@ int main(int argc, char *argv[]){
             message.mtype = MESSAGE;
             msgsnd(current_queue, &message, sizeof(message_text), 0);
 
+            if(checkDisconnectFromChat(buffer, &chat_mode, &current_queue, &message, serverID, clientID_from_server) == 0) continue;
+
             waitForMessage(clientID, &received_message);
+
+            if(checkDisconnectFromChat(received_message.message_text.mtext, &chat_mode, &current_queue, &message, serverID, clientID_from_server) == 0) continue;
+
             printf("CLIENT %d: %s",received_message.message_text.queue_id ,received_message.message_text.mtext);
         }
     }

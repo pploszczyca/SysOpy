@@ -2,9 +2,13 @@
 
 #define MAX_CLIENTS_AMMOUNT 100
 
+#define AVAILABLE 1
+#define NOT_AVAILABLE -1
+
 typedef struct client {
     int id;
     int client_queue;
+    int status;
 } client;
 
 void makeClientsList(client clients[], int n, char *message){
@@ -13,10 +17,19 @@ void makeClientsList(client clients[], int n, char *message){
     for(int i = 0; i < n; i++){
         if(clients[i].id != -1){
             strcpy(buffer, "");
-            sprintf(buffer, "CLIENT %d\n", clients[i].id);
+            sprintf(buffer, "CLIENT %d %s\n", clients[i].id, (clients[i].status == AVAILABLE ? "available" : "not available"));
             strcat(message, buffer);
         }
     }
+}
+
+int checkIfEveryOneDisconnect(client clients[MAX_CLIENTS_AMMOUNT]){
+    for(int i = 0; i < MAX_CLIENTS_AMMOUNT; i++){
+        if(clients[i].id != -1){
+            return -1;
+        }
+    }
+    return 0;
 }
 
 int main(int argc, char *argv[]){
@@ -25,7 +38,10 @@ int main(int argc, char *argv[]){
     int serverID, nOfClients = 0;
     msgbuf receivedMessage, message, client_to_connect_message, client_message;;
 
-    for(int i = 0; i < nOfClients; i++) clients[i].id = -1;
+    for(int i = 0; i < MAX_CLIENTS_AMMOUNT; i++) {
+        clients[i].id = -1;
+        clients[i].status = NOT_AVAILABLE;
+    }
 
     if((serverID = msgget(serverKey, IPC_CREAT | QUEUE_PERMISSIONS)) == -1){
         printf("Server queue error\n");
@@ -39,6 +55,7 @@ int main(int argc, char *argv[]){
             case INIT:{
                 clients[nOfClients].id = nOfClients;
                 clients[nOfClients].client_queue = receivedMessage.message_text.queue_id;
+                clients[nOfClients].status = AVAILABLE;
 
                 message.mtype = INIT;
                 message.message_text.queue_id = nOfClients;
@@ -57,11 +74,13 @@ int main(int argc, char *argv[]){
                 client_to_connect_message.mtype = CONNECT;
                 sprintf(client_to_connect_message.message_text.mtext, "%d", clients[receivedMessage.message_text.queue_id].client_queue);
                 msgsnd(clients[client_to_connect].client_queue, &client_to_connect_message, sizeof(message_text), 0);
+                clients[client_to_connect].status = NOT_AVAILABLE;
 
                 // Message to client that wants to connect
                 client_message.mtype = CONNECT;
                 sprintf(client_message.message_text.mtext, "%d", clients[client_to_connect].client_queue);
                 msgsnd(clients[receivedMessage.message_text.queue_id].client_queue, &client_message, sizeof(message_text), 0);
+                clients[receivedMessage.message_text.queue_id].status = NOT_AVAILABLE;
 
                 break;
             }
@@ -73,11 +92,16 @@ int main(int argc, char *argv[]){
             }
 
             case DISCONNECT:{
-                clients[message.message_text.queue_id].id = -1;
+                clients[receivedMessage.message_text.queue_id].status = AVAILABLE;
                 break;
             }
 
             case STOP:{
+                clients[receivedMessage.message_text.queue_id].id = -1;
+                if(checkIfEveryOneDisconnect(clients) == 0){
+                    msgctl(serverID, IPC_RMID, NULL);
+                    return 0;
+                }
                 break;
             }
                            
@@ -86,7 +110,5 @@ int main(int argc, char *argv[]){
         }
 
     }
-    
-    msgctl(serverID, IPC_RMID, NULL);
     return 0;
 }
