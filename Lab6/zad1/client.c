@@ -1,5 +1,17 @@
 #include "common.h"
 
+int clientID, clientID_from_server;
+
+void handler_SIGINT(int signum){
+    msgbuf message;
+    message.mtype = STOP;
+    message.message_text.queue_id = clientID_from_server;
+    msgsnd(serverID, &message, sizeof(message_text), 0);
+
+    msgctl(clientID, IPC_RMID, NULL);
+    exit(0);
+}
+
 int convertType(char *stringType){
     if(strcmp(stringType, "STOP") == 0) return STOP;
     else if (strcmp(stringType, "DISCONNECT\n") == 0) return DISCONNECT;
@@ -44,9 +56,11 @@ int checkDisconnectFromChat(char *buffer, int *chat_mode, int *current_queue, ms
 
 int main(int argc, char *argv[]){
     key_t serverKey = ftok(PATH_TO_GENERATE_KEY, SERVER_KEY_NUMBER);
-    int serverID, clientID, clientID_from_server, current_queue, chat_mode = 0;
+    int current_queue, chat_mode = 0;     // chat_mode: 0 - not in chat mode, 1 - in chat mode
     char buffer[MAX_MESSAGE_SIZE], command_buffer[MAX_MESSAGE_SIZE], client_to_connect_ID[MAX_MESSAGE_SIZE];
     msgbuf message, received_message, client_message;
+
+    signal(SIGINT,handler_SIGINT);
 
     if((clientID = msgget(IPC_PRIVATE, QUEUE_PERMISSIONS)) == -1){
         printf("Queue client error\n");

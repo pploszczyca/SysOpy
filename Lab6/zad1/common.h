@@ -3,6 +3,7 @@
 #include <sys/ipc.h>
 #include <stdio.h>
 #include <string.h>
+#include <signal.h>
 
 #define MAX_MESSAGE_SIZE 512
 #define QUEUE_PERMISSIONS 0660
@@ -36,3 +37,5 @@ void waitForMessage(int queue, msgbuf *ms_buffer){
         exit(1);
     }
 }
+
+int serverID;
