@@ -28,7 +28,6 @@ typedef struct msgbuf {
 } msgbuf;
 
 #define SERVER_KEY_NUMBER 0
-#define CLIENT_START_KEY_NUMBER 1
 #define PATH_TO_GENERATE_KEY getenv("HOME")
 
 void waitForMessage(int queue, msgbuf *ms_buffer){
