@@ -16,6 +16,8 @@ runChef: chefCompile
 runDeliverMan: deliverManCompile
 	./deliver_man
 
-test: pizzeriaCompile chefCompile deliverManCompile
-	./pizzeria
-	./chef
+testSmall: pizzeriaCompile chefCompile deliverManCompile
+	./pizzeria 4 4
+
+testBig: pizzeriaCompile chefCompile deliverManCompile
+	./pizzeria 10 10

@@ -1,0 +1,2 @@
+Kucharze, oraz dostawcy nie blokują się wzajemnie, niezależnie od wielkości zmiennych n oraz m.
+Nie ma problemów z wyciąganiem pizzy ze stołu, jeżeli żadnej obecnie nie ma, albo umieszczaniu dodatkowych, gdy stół jest pełny.

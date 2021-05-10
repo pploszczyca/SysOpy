@@ -1,15 +1,18 @@
 #include "common.h"
 
 void logPizzaTaken(int pizza_no, int pizzas_in_table){
-    printf("%d [%s] Pobieram pizze: %d Liczba pizz na stole: %d\n", (int) getpid(), getTimeAsString(), pizza_no, pizzas_in_table);
+    printf("%d DM [%s] Pobieram pizze: %d Liczba pizz na stole: %d\n", (int) getpid(), getTimeAsString(), pizza_no, pizzas_in_table);
 }
 
 void logDeliveredPizza(int pizza_no){
-    printf("%d [%s] Dostarczam pizze: %d\n", (int) getpid(), getTimeAsString(), pizza_no);
+    printf("%d DM [%s] Dostarczam pizze: %d\n", (int) getpid(), getTimeAsString(), pizza_no);
 }
 
 int getPizzaFromTable(){
-    int *table = attach_memory_block(TABLES_SHARED_MEMORY_KEY, N_OF_TABLES);
+    make_semaphore_operation(TABLES_KEY, TABLES_EXTRA_COUNTING ,-1);
+    make_semaphore_operation(TABLES_KEY, FILE_OPERATION_SEMAPHORE ,-1); // TODO: Repair amount of pizza in table
+
+    int *table = attach_memory_block(TABLES_KEY, N_OF_TABLES);
     int pizza_type = -1;
 
     for(int i = 0; i < N_OF_TABLES; i++){
@@ -20,12 +23,15 @@ int getPizzaFromTable(){
         }
     }
 
-    logPizzaTaken(pizza_type, calculatePizzas(table, N_OF_TABLES));
+    logPizzaTaken(pizza_type, calculatePizzas(TABLES_KEY, N_OF_TABLES));
 
     detach_memory_block(table);
+
+    make_semaphore_operation(TABLES_KEY, FILE_OPERATION_SEMAPHORE ,1);
+    make_semaphore_operation(TABLES_KEY, COUTING_SEMAPHORE ,1);
+
     return pizza_type;
 }
-
 
 int main(int argc, char *argv[]){
     srand(time(NULL));

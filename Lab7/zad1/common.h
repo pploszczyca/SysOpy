@@ -9,12 +9,17 @@
 #include <sys/shm.h>
 #include <inttypes.h>
 #include <math.h>
+#include <sys/types.h> 
 
 #define N_OF_OVENS 5
 #define N_OF_TABLES 5
 
-#define OVENS_SHARED_MEMORY_KEY "chef.c"
-#define TABLES_SHARED_MEMORY_KEY "deliver_man.c"
+#define OVENS_KEY "chef.c"
+#define TABLES_KEY "deliver_man.c"
+
+#define FILE_OPERATION_SEMAPHORE 0
+#define COUTING_SEMAPHORE 1
+#define TABLES_EXTRA_COUNTING 2
 
 #define EMPTY -1
 
@@ -34,16 +39,54 @@ char * getTimeAsString(){
     return timeInString;
 }
 
-int calculatePizzas(int *array, int n){
-    int ammount = 0;
-    for(int i = 0; i < n; i++){
-        if(array[i] != EMPTY){
-            ammount++;
-        }
+// FUNCTIONS FOR SEMAPHORE
+
+union semun {
+    int val;               /* used for SETVAL only */
+    struct semid_ds *buf;  /* used for IPC_STAT and IPC_SET */
+    ushort *array;         /* used for GETALL and SETALL */
+};
+
+static int get_semaphore(char *filename_of_semaphore){
+    key_t key = ftok(filename_of_semaphore, 2);
+    if(key == -1)   return -1;
+
+    return semget(key, 3, 0777 | IPC_CREAT);        // first for reading data from array, second for couting elements in array
+}
+
+void make_semaphore_operation(char *filename_of_semaphore, int semaphore_number, int operation){
+    int semaphore_id = get_semaphore(filename_of_semaphore);
+
+    if(semaphore_id == -1){
+        printf("Semaphore ID error\n");
+        return;
     }
 
-    return ammount;
+    struct sembuf buffer;
+    buffer.sem_num = semaphore_number;
+    buffer.sem_op = operation;
+    buffer.sem_flg = 0;
+
+    semop(semaphore_id, &buffer, 1);
 }
+
+int destroy_semaphore(char *filename_of_semaphore){
+    int semaphore_id = get_semaphore(filename_of_semaphore);
+
+    semctl(semaphore_id, 0, IPC_RMID);
+    
+}
+
+// PIZZA COUNTING
+
+int calculatePizzas(char *filename, int n){
+    int semaphore_id = get_semaphore(filename);
+    int value = semctl(semaphore_id, COUTING_SEMAPHORE, GETVAL);
+    
+    return n - value;
+}
+
+
 
 // FUNCTIONS FOR SHARED MEMORY
 
