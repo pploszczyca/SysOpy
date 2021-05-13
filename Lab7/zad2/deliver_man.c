@@ -25,7 +25,7 @@ int getPizzaFromTable(){
 
     logPizzaTaken(pizza_type, calculatePizzas(TABLES_COUTING_SEMAPHORE, N_OF_TABLES));
 
-    detach_memory_block(table);
+    detach_memory_block(table, N_OF_TABLES);
 
     make_semaphore_operation(TABLES_FILE_OPERATION_SEMAPHORE, POST);
     make_semaphore_operation(TABLES_COUTING_SEMAPHORE, POST);

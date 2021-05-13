@@ -13,6 +13,7 @@
 #include <semaphore.h>
 #include <sys/stat.h>
 #include <fcntl.h>
+#include <sys/mman.h>
 
 
 #define N_OF_OVENS 5
@@ -93,37 +94,33 @@ int calculatePizzas(char *filename, int n){
     return n - value;
 }
 
-
-
 // FUNCTIONS FOR SHARED MEMORY
 
-static int get_shared_block(char *filename_of_memory, int size){        // if size == 0 get existed memory id else if size > 0 then make new memory
-    key_t key = ftok(filename_of_memory, 0);
-    if(key == -1)   return -1;
+static int create_shated_block(char *name_of_memory, int size){
+    int fd = shm_open(name_of_memory, O_CREAT | O_RDWR, 0660);
+    ftruncate(fd, size*sizeof(int));
+}
 
-    return shmget(key, size*sizeof(int), 0777 | IPC_CREAT);
+static int get_shared_block(char *name_of_memory, int size){        // if size == 0 get existed memory id else if size > 0 then make new memory
+    return shm_open(name_of_memory, O_RDWR, 0660);
 }
 
 int *attach_memory_block(char *filename_of_memory, int size){
-    int shared_block_id = get_shared_block(filename_of_memory, size);
+    int fd = get_shared_block(filename_of_memory, size);
     int *result;
 
-    if(shared_block_id == -1)   return NULL;
+    if(fd == -1)   return NULL;
 
-    result = (int *) shmat(shared_block_id, NULL, 0);
+    result = (int *) mmap(NULL, size, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
     if(result == (int *)-1) return NULL;
 
     return result;
 }
 
-int detach_memory_block(int *block){
-    return (shmdt(block) != -1);
+int detach_memory_block(int *block, int size){
+    return munmap(block, size);
 }
 
-int destroy_memory_block(char *filename_of_memory){
-    int shared_block_id = get_shared_block(filename_of_memory, 0);
-
-    if(shared_block_id == -1)   return NULL;
-
-    return (shmctl(shared_block_id, IPC_RMID, NULL) != -1);
+int destroy_memory_block(char *name_of_memory){
+    return shm_unlink(name_of_memory);
 }

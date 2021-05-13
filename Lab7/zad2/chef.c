@@ -28,7 +28,7 @@ int putPizzaToOven(int pizza_no){
     int *ovens = attach_memory_block(OVENS_KEY, N_OF_OVENS);
     int oven_index = findEmptyPlaceAndReplaceWithValue(ovens, N_OF_OVENS, pizza_no);
 
-    detach_memory_block(ovens);
+    detach_memory_block(ovens, N_OF_OVENS);
     
     logAddPizza(pizza_no, calculatePizzas(OVENS_COUTING_SEMAPHORE, N_OF_OVENS));
 
@@ -45,7 +45,7 @@ void getPizzaFromOvenAndPutItInTable(int oven_number){
 
     ovens[oven_number] = EMPTY;
 
-    detach_memory_block(ovens);
+    detach_memory_block(ovens, N_OF_OVENS);
     
     int pizzasInOven = calculatePizzas(OVENS_COUTING_SEMAPHORE, N_OF_OVENS);
 
@@ -60,7 +60,7 @@ void getPizzaFromOvenAndPutItInTable(int oven_number){
 
     logRemovePizzaFromOven(pizza_no, pizzasInOven, calculatePizzas(TABLES_COUTING_SEMAPHORE, N_OF_TABLES));
 
-    detach_memory_block(tables);
+    detach_memory_block(tables, N_OF_TABLES);
 
     make_semaphore_operation(TABLES_TABLES_EXTRA_COUNTING, POST);
     make_semaphore_operation(TABLES_FILE_OPERATION_SEMAPHORE, POST);

@@ -2,13 +2,13 @@ CC = gcc
 CFLAGS = -Wall
 
 chefCompile:
-	$(CC) $(CFLAGS) chef.c -o chef -lm -lpthread
+	$(CC) $(CFLAGS) chef.c -o chef -lm -lpthread -lrt
 
 deliverManCompile:
-	$(CC) $(CFLAGS) deliver_man.c -o deliver_man -lm -lpthread
+	$(CC) $(CFLAGS) deliver_man.c -o deliver_man -lm -lpthread -lrt
 
 pizzeriaCompile:
-	$(CC) $(CFLAGS) pizzeria.c -o pizzeria -lm -lpthread
+	$(CC) $(CFLAGS) pizzeria.c -o pizzeria -lm -lpthread -lrt
 
 runChef: chefCompile
 	./chef

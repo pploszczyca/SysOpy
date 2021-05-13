@@ -2,11 +2,13 @@
 
 void initArray(char *filename, int size){
     destroy_memory_block(filename);
+    create_shated_block(filename, size);
+    
     int *array = attach_memory_block(filename, size);
 
     for(int i = 0; i < size; i++)   array[i] = EMPTY;
 
-    detach_memory_block(filename);
+    detach_memory_block(filename, size);
 }
 
 void initSemaphores(){
