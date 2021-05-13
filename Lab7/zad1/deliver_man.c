@@ -10,7 +10,7 @@ void logDeliveredPizza(int pizza_no){
 
 int getPizzaFromTable(){
     make_semaphore_operation(TABLES_KEY, TABLES_EXTRA_COUNTING ,-1);
-    make_semaphore_operation(TABLES_KEY, FILE_OPERATION_SEMAPHORE ,-1); // TODO: Repair amount of pizza in table
+    make_semaphore_operation(TABLES_KEY, FILE_OPERATION_SEMAPHORE ,-1);
 
     int *table = attach_memory_block(TABLES_KEY, N_OF_TABLES);
     int pizza_type = -1;
