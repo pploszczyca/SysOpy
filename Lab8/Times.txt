@@ -1,0 +1,96 @@
+TEST TYPE=NUMBERS
+
+ Ilość wątków: 1
+    Thread number:  0 Time:    1979 μs
+    TOTAL PROGRAM TIME:        2094 μs
+ 
+ Ilość wątków: 2
+    Thread number:  0 Time:    1308 μs
+    Thread number:  1 Time:    1866 μs
+    TOTAL PROGRAM TIME:        1982 μs
+ 
+ Ilość wątków: 4
+    Thread number:  1 Time:    1314 μs
+    Thread number:  2 Time:    1697 μs
+    Thread number:  0 Time:    1991 μs
+    Thread number:  3 Time:    2038 μs
+    TOTAL PROGRAM TIME:        2158 μs
+ 
+ Ilość wątków: 8
+    Thread number:  7 Time:    1741 μs
+    Thread number:  0 Time:    2012 μs
+    Thread number:  1 Time:    1985 μs
+    Thread number:  2 Time:    1984 μs
+    Thread number:  6 Time:    1947 μs
+    Thread number:  5 Time:    2116 μs
+    Thread number:  4 Time:    2290 μs
+    Thread number:  3 Time:    2515 μs
+    TOTAL PROGRAM TIME:        2668 μs
+ 
+ Ilość wątków: 16
+    Thread number:  0 Time:    1951 μs
+    Thread number:  3 Time:    1945 μs
+    Thread number:  2 Time:    1937 μs
+    Thread number:  4 Time:    1965 μs
+    Thread number:  1 Time:    1947 μs
+    Thread number:  5 Time:    2025 μs
+    Thread number:  6 Time:    2132 μs
+    Thread number:  8 Time:    2297 μs
+    Thread number: 14 Time:    1003 μs
+    Thread number: 13 Time:    1858 μs
+    Thread number: 15 Time:    1764 μs
+    Thread number: 12 Time:    1888 μs
+    Thread number: 10 Time:    2097 μs
+    Thread number:  9 Time:    2307 μs
+    Thread number:  7 Time:    2191 μs
+    Thread number: 11 Time:    1037 μs
+    TOTAL PROGRAM TIME:        5050 μs
+
+
+TEST TYPE=BLOCK
+
+ Ilość wątków: 1
+    THREAD NUMBER:  0 TIME:    1418 μs
+    TOTAL PROGRAM TIME:        1552 μs
+ 
+ Ilość wątków: 2
+    THREAD NUMBER:  0 TIME:     709 μs
+    THREAD NUMBER:  1 TIME:     689 μs
+    TOTAL PROGRAM TIME:         852 μs
+ 
+ Ilość wątków: 4
+    THREAD NUMBER:  2 TIME:     351 μs
+    THREAD NUMBER:  1 TIME:     428 μs
+    THREAD NUMBER:  0 TIME:     710 μs
+    THREAD NUMBER:  3 TIME:     694 μs
+    TOTAL PROGRAM TIME:         822 μs
+ 
+ Ilość wątków: 8
+    THREAD NUMBER:  0 TIME:     364 μs
+    THREAD NUMBER:  1 TIME:     340 μs
+    THREAD NUMBER:  2 TIME:     333 μs
+    THREAD NUMBER:  5 TIME:     327 μs
+    THREAD NUMBER:  3 TIME:     332 μs
+    THREAD NUMBER:  4 TIME:     329 μs
+    THREAD NUMBER:  6 TIME:     329 μs
+    THREAD NUMBER:  7 TIME:     318 μs
+    TOTAL PROGRAM TIME:         535 μs
+ 
+ Ilość wątków: 16
+    THREAD NUMBER:  1 TIME:     145 μs
+    THREAD NUMBER:  2 TIME:     170 μs
+    THREAD NUMBER:  0 TIME:     190 μs
+    THREAD NUMBER:  3 TIME:     174 μs
+    THREAD NUMBER:  4 TIME:     183 μs
+    THREAD NUMBER:  5 TIME:     171 μs
+    THREAD NUMBER:  7 TIME:     160 μs
+    THREAD NUMBER: 10 TIME:     263 μs
+    THREAD NUMBER: 12 TIME:     185 μs
+    THREAD NUMBER:  8 TIME:     180 μs
+    THREAD NUMBER: 13 TIME:     189 μs
+    THREAD NUMBER: 11 TIME:     193 μs
+    THREAD NUMBER: 15 TIME:     186 μs
+    THREAD NUMBER:  9 TIME:     108 μs
+    THREAD NUMBER:  6 TIME:     142 μs
+    THREAD NUMBER: 14 TIME:     120 μs
+    TOTAL PROGRAM TIME:         734 μs
