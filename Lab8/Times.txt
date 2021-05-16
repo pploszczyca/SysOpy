@@ -94,3 +94,9 @@ TEST TYPE=BLOCK
     THREAD NUMBER:  5 TIME:     122 μs
     THREAD NUMBER:  7 TIME:     356 μs
     TOTAL PROGRAM TIME:        1095 μs
+
+
+WNIOSKI:
+   - Dla pierwszego wariantu im więcej mamy wątków, tym czas wykonania programu jest dłuższy
+   - Drugi wariant osiąga mniejsze czasy wykonania programu niż pierwszy wariant
+   - Dla drugiego wariantu najszybszy czas wykonania programu uzyskujemy dla liczby wątków równej 4

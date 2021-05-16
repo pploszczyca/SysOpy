@@ -31,8 +31,7 @@ double calculate_time(struct timeval tv1, struct timeval tv2){
 
 void *numbers_image_processing(void *arg){
     processing_data data = *(processing_data*)arg;
-    int index;
-
+    
     struct timeval  tv1, tv2;
     gettimeofday(&tv1, NULL);       // Start time
 
