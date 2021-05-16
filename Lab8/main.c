@@ -6,7 +6,8 @@
 
 // Structure for ASCII PGM image 
 typedef struct matrix_data {
-    int *imageMatrix;
+    int *oryginalImageMatrix;
+    int *newImageMatrix;
     int xsize;
     int ysize;
     int maxg;
@@ -35,13 +36,9 @@ void *numbers_image_processing(void *arg){
     struct timeval  tv1, tv2;
     gettimeofday(&tv1, NULL);       // Start time
 
-    for(int y = 0; y < data.image->ysize ; y++){
-        for(int x = 0; x < data.image->xsize; x++){
-            index = y*data.image->xsize+x;
-
-            if(data.start <= data.image->imageMatrix[index] && data.image->imageMatrix[index] <= data.end){
-                data.image->imageMatrix[index] = calculateNewPixel(data.image->imageMatrix[index]);
-            }
+    for(int i = 0; i < data.image->ysize*data.image->xsize; i++){
+        if(data.start <= data.image->oryginalImageMatrix[i] && data.image->oryginalImageMatrix[i] <= data.end){
+                data.image->newImageMatrix[i] = calculateNewPixel(data.image->oryginalImageMatrix[i]);
         }
     }
 
@@ -61,7 +58,7 @@ void *blocks_image_processing(void *arg){
     for(int y = 0; y < data.image->ysize ; y++){
         for(int x = data.start; x <= data.end; x++){
             index = y*data.image->xsize+x;
-            data.image->imageMatrix[index] = calculateNewPixel(data.image->imageMatrix[index]);
+            data.image->newImageMatrix[index] = calculateNewPixel(data.image->oryginalImageMatrix[index]);
         }
     }
 
@@ -75,6 +72,7 @@ int main(int argc, char *argv[]){
     int nOfThreads;
     char *typeOfDivision, *inputFilePath, *outputFilePath;
     pthread_t *threads;
+    pthread_t threadID;
     matrix_data imageData;
     processing_data *data;
     struct timeval  tv1, tv2;
@@ -91,7 +89,8 @@ int main(int argc, char *argv[]){
 
     threads = calloc(nOfThreads, sizeof(pthread_t));
 
-    pgma_read(inputFilePath, &imageData.xsize, &imageData.ysize, &imageData.maxg, &imageData.imageMatrix);
+    pgma_read(inputFilePath, &imageData.xsize, &imageData.ysize, &imageData.maxg, &imageData.oryginalImageMatrix);
+    imageData.newImageMatrix = calloc(imageData.xsize * imageData.ysize, sizeof(int));
 
     gettimeofday(&tv1, NULL);       // Start time
     for(int k = 0; k < nOfThreads; k++){
@@ -119,9 +118,10 @@ int main(int argc, char *argv[]){
 
     printf("    TOTAL PROGRAM TIME: %11g μs\n", calculate_time(tv1, tv2));
 
-    pgma_write(outputFilePath, "Result" ,imageData.xsize, imageData.ysize, imageData.maxg, imageData.imageMatrix);
+    pgma_write(outputFilePath, "Result" ,imageData.xsize, imageData.ysize, imageData.maxg, imageData.newImageMatrix);
 
     free(threads);
-    free(imageData.imageMatrix);
+    free(imageData.oryginalImageMatrix);
+    free(imageData.newImageMatrix);
     return 0;
 }

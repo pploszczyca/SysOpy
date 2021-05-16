@@ -1,0 +1,80 @@
+make[1]: Entering directory '/home/pepe/Projekty/Semestr4/SysOpy/Lab8'
+echo "TEST TYPE=NUMBERS";
+TEST TYPE=NUMBERS
+for number in 1 2 4 8 16; do \
+	echo " Ilość wątków: $number"; \
+	./main $number numbers balloons.ascii.pgm test_numbers$number.pgm; \
+done
+ Ilość wątków: 1
+START:   0 END: 255
+    Thread number:  0 Time:    2016 μs
+    TOTAL PROGRAM TIME:        2182 μs
+ Ilość wątków: 2
+START:   0 END: 126
+START: 127 END: 255
+    Thread number:  0 Time:    1501 μs
+    Thread number:  1 Time:    1475 μs
+    TOTAL PROGRAM TIME:        1649 μs
+ Ilość wątków: 4
+START:   0 END:  62
+START:  63 END: 125
+START: 126 END: 188
+START: 189 END: 255
+    Thread number:  0 Time:     884 μs
+    Thread number:  3 Time:    1228 μs
+    Thread number:  1 Time:    1260 μs
+    Thread number:  2 Time:    1309 μs
+    TOTAL PROGRAM TIME:        1444 μs
+ Ilość wątków: 8
+START:   0 END:  30
+START:  31 END:  61
+START:  62 END:  92
+START:  93 END: 123
+START: 124 END: 154
+START: 155 END: 185
+START: 186 END: 216
+START: 217 END: 255
+    Thread number:  1 Time:    1562 μs
+    Thread number:  0 Time:    1600 μs
+    Thread number:  7 Time:    1615 μs
+    Thread number:  6 Time:    1636 μs
+    Thread number:  2 Time:    1708 μs
+    Thread number:  5 Time:    1656 μs
+    Thread number:  3 Time:    1849 μs
+    Thread number:  4 Time:    1877 μs
+    TOTAL PROGRAM TIME:        2056 μs
+ Ilość wątków: 16
+START:   0 END:  14
+START:  15 END:  29
+START:  30 END:  44
+START:  45 END:  59
+START:  60 END:  74
+START:  75 END:  89
+START:  90 END: 104
+START: 105 END: 119
+START: 120 END: 134
+START: 135 END: 149
+START: 150 END: 164
+START: 165 END: 179
+START: 180 END: 194
+START: 195 END: 209
+START: 210 END: 224
+START: 225 END: 255
+    Thread number:  1 Time:    1547 μs
+    Thread number:  3 Time:    1536 μs
+    Thread number:  0 Time:    1576 μs
+    Thread number:  2 Time:    1562 μs
+    Thread number:  4 Time:    1581 μs
+    Thread number:  5 Time:    1843 μs
+    Thread number:  6 Time:    1825 μs
+    Thread number:  8 Time:    2014 μs
+    Thread number: 14 Time:    1409 μs
+    Thread number: 15 Time:    1478 μs
+    Thread number: 11 Time:    1648 μs
+    Thread number:  7 Time:    1621 μs
+    Thread number: 12 Time:    1368 μs
+    Thread number: 13 Time:    1432 μs
+    Thread number:  9 Time:    2027 μs
+    Thread number: 10 Time:    1555 μs
+    TOTAL PROGRAM TIME:        3991 μs
+make[1]: Leaving directory '/home/pepe/Projekty/Semestr4/SysOpy/Lab8'
