@@ -21,6 +21,20 @@ int connect_to_server_network(char *server_adress){
     return server_socket;
 }
 
+int connect_to_server_local(char *server_adress) {
+    SA_UN server_addr;
+    int server_socket;
+
+    check_error((server_socket = socket(AF_UNIX, SOCK_STREAM, 0)), "Failed to create socket");
+
+    memset(&server_addr, 0, sizeof(server_addr));
+    server_addr.sun_family = AF_UNIX;
+    strcpy(server_addr.sun_path, server_adress);
+
+    check_error((connect(server_socket, (SA*) &server_addr, sizeof(server_addr))), "Connect error!");
+
+    return server_socket;
+}
 
 int main(int argc, char const *argv[]) {
     char *client_name, *connection_type, *connection_path;     // connection_type = 'network' or 'local'
@@ -36,12 +50,12 @@ int main(int argc, char const *argv[]) {
     if(strcmp(connection_type, "network") == 0) {
         server_socket = connect_to_server_network(connection_path);
     } else if (strcmp(connection_type, "local") == 0) {
-
+        server_socket = connect_to_server_local(connection_path);
     } else {
         check_error(-1, "Bad arguments");
     }
 
-    strcpy(buffer, "Test, hi \n");
+    strcpy(buffer, "Test, hi\n");
 
     write(server_socket, (char *)buffer, strlen(buffer));
 
@@ -52,5 +66,6 @@ int main(int argc, char const *argv[]) {
         if(server_buffer[n_read_chars - 1] == '\n')    break;
     }
 
+    close_server(server_socket);
     return 0;
 }

@@ -1,6 +1,6 @@
 CC = gcc
 CFLAGS = -Wall
-PORT = 18002
+PORT = 18000
 
 serverCompile:
 	$(CC) $(CFLAGS) server.c -o server
@@ -9,7 +9,10 @@ clientCompile:
 	$(CC) $(CFLAGS) client.c -o client
 
 server: serverCompile
-	./server $(PORT) test.txt
+	./server $(PORT) ./us
 
-client: clientCompile
+clientNetwork: clientCompile
 	./client Me network 127.0.0.1:$(PORT)
+
+clientLocal: clientCompile
+	./client Me local ./us
