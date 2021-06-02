@@ -36,16 +36,32 @@ int connect_to_server_local(char *server_adress) {
     return server_socket;
 }
 
+char wait_for_message_and_print_it(int server_socket){
+    int n_read_chars;
+    char server_buffer[MAX_BUFFER_SIZE];
+
+    memset(server_buffer,0,sizeof(server_buffer));
+
+    while((n_read_chars = read(server_socket, server_buffer, MAX_BUFFER_SIZE-1)) > 0) {
+        printf("%s", server_buffer);
+
+        // Read until new line is reached
+        if(server_buffer[n_read_chars - 1] == '\n')    break;
+    }
+}
+
 int main(int argc, char const *argv[]) {
     char *client_name, *connection_type, *connection_path;     // connection_type = 'network' or 'local'
     int server_socket;
-    char buffer[MAX_BUFFER_SIZE], server_buffer[MAX_BUFFER_SIZE];
+    char buffer[MAX_BUFFER_SIZE], server_buffer[MAX_BUFFER_SIZE], board_buffer[BOARD_SIZE];
     int n_read_chars;
 
     check_error(argc == 4, "Bad arguments");
     client_name = argv[1];
     connection_type = argv[2];
     connection_path = argv[3];
+
+    printf("PLAYER NAME: %s\n", client_name);
 
     if(strcmp(connection_type, "network") == 0) {
         server_socket = connect_to_server_network(connection_path);
@@ -55,16 +71,22 @@ int main(int argc, char const *argv[]) {
         check_error(-1, "Bad arguments");
     }
 
-    strcpy(buffer, "Test, hi\n");
+    write_message(server_socket, client_name);
 
-    write(server_socket, (char *)buffer, strlen(buffer));
+    wait_for_message_and_print_it(server_socket);       // For "wait for player"
+    wait_for_message_and_print_it(server_socket);       // For "game start"
+    
 
-    while((n_read_chars = read(server_socket, server_buffer, MAX_BUFFER_SIZE)) > 0) {
-        printf("%s", server_buffer);
+    memset(board_buffer,0,sizeof(board_buffer));
 
-        // Read until new line is reached
-        if(server_buffer[n_read_chars - 1] == '\n')    break;
+    while((n_read_chars = read(server_socket, board_buffer, BOARD_SIZE)) > 0) {
+            // printf("%s", board_buffer);
+
+            // Read until new line is reached
+        if(board_buffer[n_read_chars - 1] == '\n')    break;
     }
+
+    print_board(board_buffer);
 
     close_server(server_socket);
     return 0;

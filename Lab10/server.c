@@ -1,6 +1,18 @@
 #include "common.h"
 
 #define SERVER_BACKLOG 1
+#define MAX_PLAYERS_CONNECTED 20
+
+typedef struct player {
+    char name[MAX_PLAYER_NAME_SIZE];
+    int player_socket;
+} player;
+
+typedef struct game {
+    player *first_player;
+    player *second_player;
+    char board[BOARD_SIZE];
+} game;
 
 int setup_server_network(int port) {
     int server_socket;
@@ -43,30 +55,38 @@ int accept_new_connection(int server_socket) {
     return client_socket;
 }
 
-void handle_conncetion(int client_socket) {
-    char buffer[MAX_BUFFER_SIZE], response_buffer[MAX_BUFFER_SIZE];
+void get_name_of_player(player client_player){
     int n_read_chars;
 
-    strcpy(buffer, "");
+    n_read_chars = read(client_player.player_socket, client_player.name, MAX_PLAYER_NAME_SIZE-1);
+    printf("%s", client_player.name);
+}
 
-    while((n_read_chars = read(client_socket, buffer, MAX_BUFFER_SIZE-1)) > 0) {
-        printf("%s", buffer);
+void *start_game(void *arg){
+    game game_arg = *(game *) arg;
+    free(arg);
 
-        // Read until new line is reached
-        if(buffer[n_read_chars - 1] == '\n')    break;
-    }
-    check_error(n_read_chars, "Reading error!");
+    strcpy(game_arg.board, "000000000\n");        // Init board
 
-    strcpy(response_buffer, "Server response :D \n");        // For testing in browser
+    write_message(game_arg.first_player->player_socket, "GAME STARTED!\n");
+    sleep(1);       // because messages are joining together
+    write_message(game_arg.first_player->player_socket, game_arg.board);
 
-    write(client_socket, (char *)response_buffer, strlen(response_buffer));
-    close(client_socket);
+    write_message(game_arg.second_player->player_socket, "GAME STARTED!\n");
+    sleep(1);       // because messages are joining together
+    write_message(game_arg.second_player->player_socket, game_arg.board);    
+
+    close(game_arg.first_player->player_socket);
+    close(game_arg.second_player->player_socket);
 }
 
 int main(int argc, char const *argv[]) {
-    int port_number, server_socket_network, server_socket_local;
+    int port_number, server_socket_network, server_socket_local, n_of_players = 0;
     char *socket_path;
+    char buffer[MAX_BUFFER_SIZE];
     fd_set current_sockets, ready_sockets;
+    player players[MAX_PLAYERS_CONNECTED];
+    player *waiting_player = NULL;
 
     check_error(argc != 3, "Bad arguments");
     port_number = atoi(argv[1]);
@@ -91,7 +111,27 @@ int main(int argc, char const *argv[]) {
                     int client_socket = accept_new_connection(i);
                     FD_SET(client_socket, &current_sockets);
                 } else {
-                    handle_conncetion(i);
+                    players[n_of_players].player_socket = i;
+                    get_name_of_player(players[n_of_players]);
+
+                    write_message(players[n_of_players].player_socket, "Waiting for player ... \n");
+
+                    if(waiting_player == NULL) {
+                        waiting_player = &players[n_of_players];
+
+                    } else {
+                        pthread_t thread_id;
+                        game *game_arg = malloc(sizeof(game));
+                        game_arg->first_player = waiting_player;
+                        game_arg->second_player = &players[n_of_players];
+
+                        pthread_create(&thread_id, NULL, start_game, game_arg);
+
+                        waiting_player = NULL;
+                    }
+
+                    n_of_players++;
+
                     FD_CLR(i, &current_sockets);
                 }
             }
