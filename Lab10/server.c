@@ -4,8 +4,9 @@
 #define MAX_PLAYERS_CONNECTED 20
 
 typedef struct player {
-    char name[MAX_PLAYER_NAME_SIZE];
+    char name[MAX_BUFFER_SIZE];
     int player_socket;
+    char game_char;     // game_char = 'X' || 'O'
 } player;
 
 typedef struct game {
@@ -55,26 +56,68 @@ int accept_new_connection(int server_socket) {
     return client_socket;
 }
 
-void get_name_of_player(player client_player){
-    int n_read_chars;
+int check_one_case(char *board, int a, int b, int c){       // for check_if_win function
+    return board[a] != ' ' && board[a] == board[b] && board[b] == board[c];
+}
 
-    n_read_chars = read(client_player.player_socket, client_player.name, MAX_PLAYER_NAME_SIZE-1);
-    printf("%s", client_player.name);
+int check_if_win(char *board){      // 0 - true, -1 - false
+    for(int i = 0; i < 3; i++){
+        if(check_one_case(board, i, i+1, i+2))  return 0;
+        if(check_one_case(board, i, i+3, i+6))  return 0;
+    }
+    if(check_one_case(board, 0, 4, 8))  return 0;
+    if(check_one_case(board, 2, 4, 6))  return 0;
+
+    return -1;
+}
+
+void send_the_same_message_to_two_players(game *game_arg, char *message){
+    write_message(game_arg->first_player->player_socket, message);
+    write_message(game_arg->second_player->player_socket, message);
+}
+
+int player_turn(game *game_arg, player *player){
+    int n;
+    char buffer[MAX_BUFFER_SIZE];
+
+    read_message(player->player_socket, buffer);
+    n = atoi(buffer) - 1;
+    game_arg->board[n] = game_arg->board[n] == ' ' ? player->game_char : game_arg->board[n];
+
+    if(check_if_win(game_arg->board) == 0){
+        send_the_same_message_to_two_players(game_arg, "WIN\n");
+        send_the_same_message_to_two_players(game_arg, game_arg->board);
+        sprintf(buffer, "THE END. THE WINNER IS: %s", player->name);
+        send_the_same_message_to_two_players(game_arg, buffer);
+        return 1;
+    }
+
+    send_the_same_message_to_two_players(game_arg, game_arg->board);
+    return 0;
 }
 
 void *start_game(void *arg){
+    char first_player_buffer[MAX_BUFFER_SIZE], second_player_buffer[MAX_BUFFER_SIZE];
     game game_arg = *(game *) arg;
     free(arg);
 
-    strcpy(game_arg.board, "000000000\n");        // Init board
+    strcpy(game_arg.board, "         \n");        // Init board
 
-    write_message(game_arg.first_player->player_socket, "GAME STARTED!\n");
-    sleep(1);       // because messages are joining together
-    write_message(game_arg.first_player->player_socket, game_arg.board);
+    sprintf(first_player_buffer, "GAME STARTED! Your char is: %c. You are playing with: %s\n",'X',game_arg.second_player->name);
+    write_message(game_arg.first_player->player_socket, first_player_buffer);
 
-    write_message(game_arg.second_player->player_socket, "GAME STARTED!\n");
-    sleep(1);       // because messages are joining together
-    write_message(game_arg.second_player->player_socket, game_arg.board);    
+    sprintf(second_player_buffer, "GAME STARTED! Your char is: %c. You are playing with: %s\n",'O',game_arg.first_player->name);
+    write_message(game_arg.second_player->player_socket, second_player_buffer);
+    
+    send_the_same_message_to_two_players(&game_arg, game_arg.board);
+
+    write_message(game_arg.first_player->player_socket, START_FIRST);
+    write_message(game_arg.second_player->player_socket, START_SECOND);    
+
+    for(;;) {       // Game turns
+        if(player_turn(&game_arg, game_arg.first_player))    break;
+        if(player_turn(&game_arg, game_arg.second_player))    break;
+    }
 
     close(game_arg.first_player->player_socket);
     close(game_arg.second_player->player_socket);
@@ -112,11 +155,13 @@ int main(int argc, char const *argv[]) {
                     FD_SET(client_socket, &current_sockets);
                 } else {
                     players[n_of_players].player_socket = i;
-                    get_name_of_player(players[n_of_players]);
+                    
+                    read_message(players[n_of_players].player_socket, players[n_of_players].name);
 
-                    write_message(players[n_of_players].player_socket, "Waiting for player ... \n");
+                    write_message(players[n_of_players].player_socket, "Waiting for player ...\n");
 
                     if(waiting_player == NULL) {
+                        players[n_of_players].game_char = 'X';
                         waiting_player = &players[n_of_players];
 
                     } else {
@@ -124,6 +169,7 @@ int main(int argc, char const *argv[]) {
                         game *game_arg = malloc(sizeof(game));
                         game_arg->first_player = waiting_player;
                         game_arg->second_player = &players[n_of_players];
+                        players[n_of_players].game_char = 'O';
 
                         pthread_create(&thread_id, NULL, start_game, game_arg);
 

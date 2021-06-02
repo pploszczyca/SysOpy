@@ -25,8 +25,11 @@ typedef struct sockaddr_un SA_UN;
 typedef struct sockaddr SA;
 
 #define MAX_PLAYER_NAME_SIZE 50
-#define MAX_BUFFER_SIZE 256
+#define MAX_BUFFER_SIZE 512
 #define BOARD_SIZE 10
+
+#define START_FIRST "FIRST\n"
+#define START_SECOND "SECOND\n"
 
 void close_server(int fd){        // is_server = 0 if true
     shutdown(fd, SHUT_RDWR);
@@ -37,20 +40,27 @@ void write_message(int socket_id, char *message){
     write(socket_id, message, strlen(message));
 }
 
-char transfer_to_board(char i){       // 0 to ' ', 1 to X, 2 to O
-    if(i == '1') return 'X';
-    if(i == '2') return 'O';
-    return ' ';
+void read_message(int socket_id, char buffer[MAX_BUFFER_SIZE]){
+    int n_read_chars;
+    char char_buffer;
+
+    memset(buffer,0,sizeof(buffer));
+    for(int i = 0; i < MAX_BUFFER_SIZE; i++){
+        n_read_chars = read(socket_id, &char_buffer, 1);
+
+        if(n_read_chars < 1 || char_buffer == '\n')    break;
+        
+        strncat(buffer, &char_buffer, 1);
+    }
 }
 
 void print_board(char *board_array){
     printf("\n");
-    printf("%s", board_array);
-    
+
     for(int i = 0; i < 3; i++){
         printf("-------\n");
         for(int j = 0; j < 3; j++){
-            printf("|%c", transfer_to_board(board_array[i*3+j]));
+            printf("|%c", board_array[i*3+j]);
         }
         printf("|\n");
     }
