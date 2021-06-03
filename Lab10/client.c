@@ -36,19 +36,23 @@ int connect_to_server_local(char *server_adress) {
     return server_socket;
 }
 
-void make_move(int server_socket) {
-    char buffer[MAX_BUFFER_SIZE];
-
-    printf("Write number (1-9)\n");
-    scanf("%s", buffer);
-    strcat(buffer, "\n");
-    write_message(server_socket, buffer);
-}
-
 void read_and_print_message(int server_socket) {
     char buffer[MAX_BUFFER_SIZE];
     read_message(server_socket, buffer);
     printf("%s\n", buffer);
+}
+
+void print_board(char *board_array){
+    printf("\n");
+
+    for(int i = 0; i < 3; i++){
+        printf("-------\n");
+        for(int j = 0; j < 3; j++){
+            printf("|%c", board_array[i*3+j]);
+        }
+        printf("|\n");
+    }
+    printf("-------\n");
 }
 
 void read_and_print_board(int server_socket) {
@@ -57,22 +61,9 @@ void read_and_print_board(int server_socket) {
     print_board(buffer);
 }
 
-int wait_for_server_information(int server_socket) {
-    char server_buffer[MAX_BUFFER_SIZE];
-
-    read_message(server_socket, server_buffer);         // For board
-    if(strcmp(server_buffer, "WIN") == 0){
-        read_and_print_board(server_socket);     // For board
-        read_and_print_message(server_socket);
-        return 1;
-    }
-    print_board(server_buffer);
-
-    return 0;
-}
 
 int main(int argc, char const *argv[]) {
-    char *client_name, *connection_type, *connection_path;     // connection_type = 'network' or 'local'
+    char *client_name, *connection_type, *connection_path, type_of_message;     // connection_type = 'network' or 'local'
     int server_socket;
     char server_buffer[MAX_BUFFER_SIZE];
 
@@ -92,27 +83,65 @@ int main(int argc, char const *argv[]) {
     }
 
     strcat(client_name, "\n");
-    write_message(server_socket, client_name);
-
-    read_and_print_message(server_socket);   // For "wait for player"
-    read_and_print_message(server_socket);   // For "game start"
-    
-    read_and_print_board(server_socket);     // For board
-
-    read_message(server_socket, server_buffer);         // For information, who starts firts
-    
-    if(strcmp(server_buffer, "FIRST") == 0){
-        make_move(server_socket);
-        read_and_print_board(server_socket);     // For board
-    }
+    write_message(server_socket, client_name, ADD_NEW_CLIENT);
 
     for(;;) {
-        printf("Wait for other player move\n");
-        if(wait_for_server_information(server_socket)) break;
+        read_message(server_socket, server_buffer);
+        type_of_message = server_buffer[0];
 
-        make_move(server_socket);
+        switch (type_of_message) {
+            case WAIT_FOR_PLAYER:
+                read_and_print_message(server_socket);
+                break;
+            
+            case GAME_START_INFORMATION:
+                read_and_print_message(server_socket);
+                break;
 
-        if(wait_for_server_information(server_socket)) break;
+            case YOUR_TURN: {
+                printf("Write number (1-9)\n");
+                scanf("%s", server_buffer);
+                strcat(server_buffer, "\n");
+                write_message(server_socket, server_buffer, MOVE);
+                break;
+            }
+
+            case BOARD:
+                read_and_print_board(server_socket);
+                break;
+
+            case WAIT:
+                printf("Wait for enemy move\n");
+                break;
+
+            case PING:
+                write_message(server_socket, PING_MESSAGE, PING);
+                break;
+
+            case ADD_ERROR:
+                printf("Adding to server error!\n");
+                exit(1);
+
+            case ERROR:
+                printf("Error appear!\n");
+                exit(1);
+
+            case WIN:{
+                read_and_print_message(server_socket);
+                break;
+            }
+
+            case END_OF_GAME: {
+                close_server(server_socket);
+                exit(0);
+            }
+
+            default:
+                printf("TYPE OF MESSAGE ERROR\n");
+                close_server(server_socket);
+                exit(1);
+                break;
+        }
     }
 
     close_server(server_socket);

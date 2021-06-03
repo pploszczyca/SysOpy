@@ -71,37 +71,45 @@ int check_if_win(char *board){      // 0 - true, -1 - false
     return -1;
 }
 
-void send_the_same_message_to_two_players(game *game_arg, char *message){
-    write_message(game_arg->first_player->player_socket, message);
-    write_message(game_arg->second_player->player_socket, message);
+void send_the_same_message_to_two_players(game *game_arg, char *message, message_type type_of_message){
+    write_message(game_arg->first_player->player_socket, message, type_of_message);
+    write_message(game_arg->second_player->player_socket, message, type_of_message);
 }
 
-int player_turn(game *game_arg, player *player){
+void send_only_message_type_to_two_players(game *game_arg, message_type type_of_message){
+    write_only_message_type(game_arg->first_player->player_socket, type_of_message);
+    write_only_message_type(game_arg->second_player->player_socket, type_of_message);
+}
+
+int player_turn(game *game_arg, player *player_with_move, player *another_player){
     int n;
     char buffer[MAX_BUFFER_SIZE];
+    
+    write_only_message_type(player_with_move->player_socket, YOUR_TURN);
+    write_only_message_type(another_player->player_socket, WAIT);
 
-    read_message(player->player_socket, buffer);
+    read_message(player_with_move->player_socket, buffer);        // for message type
+    read_message(player_with_move->player_socket, buffer);
     n = atoi(buffer) - 1;
-    game_arg->board[n] = game_arg->board[n] == ' ' ? player->game_char : game_arg->board[n];
+    game_arg->board[n] = game_arg->board[n] == ' ' ? player_with_move->game_char : game_arg->board[n];
 
     if(check_if_win(game_arg->board) == 0){
-        send_the_same_message_to_two_players(game_arg, "WIN\n");
-        send_the_same_message_to_two_players(game_arg, game_arg->board);
-        sprintf(buffer, "THE END. THE WINNER IS: %s", player->name);
-        send_the_same_message_to_two_players(game_arg, buffer);
+        send_the_same_message_to_two_players(game_arg, game_arg->board, BOARD);
+        sprintf(buffer, "THE END. THE WINNER IS: %s\n", player_with_move->name);
+        send_the_same_message_to_two_players(game_arg, buffer, WIN);
+        send_only_message_type_to_two_players(game_arg, END_OF_GAME);
         return 1;
     }
 
-    send_the_same_message_to_two_players(game_arg, game_arg->board);
+    send_the_same_message_to_two_players(game_arg, game_arg->board, BOARD);
     return 0;
 }
 
-void init_player_in_game(game *game_arg, player * client_player, char *second_player_name, char *who_start_first_message){
+void init_player_in_game(game *game_arg, player * client_player, char *second_player_name){
     char player_buffer[MAX_BUFFER_SIZE];
-    sprintf(player_buffer, "GAME STARTED! Your char is: %c. You are playing with: %s\n",'X',second_player_name);
-    write_message(client_player->player_socket, player_buffer);
-    write_message(client_player->player_socket, game_arg->board);
-    write_message(client_player->player_socket, who_start_first_message);
+    sprintf(player_buffer, "GAME STARTED! Your char is: %c. You are playing with: %s\n",client_player->game_char,second_player_name);
+    write_message(client_player->player_socket, player_buffer, GAME_START_INFORMATION);
+    write_message(client_player->player_socket, game_arg->board, BOARD);
 }
 
 void *start_game(void *arg){
@@ -109,12 +117,12 @@ void *start_game(void *arg){
     free(arg);
 
     // Send informations to players
-    init_player_in_game(&game_arg, game_arg.first_player, game_arg.second_player->name, START_FIRST);
-    init_player_in_game(&game_arg, game_arg.second_player, game_arg.first_player->name, START_SECOND); 
+    init_player_in_game(&game_arg, game_arg.first_player, game_arg.second_player->name);
+    init_player_in_game(&game_arg, game_arg.second_player, game_arg.first_player->name); 
 
     for(;;) {       // Game turns
-        if(player_turn(&game_arg, game_arg.first_player))    break;
-        if(player_turn(&game_arg, game_arg.second_player))    break;
+        if(player_turn(&game_arg, game_arg.first_player, game_arg.second_player))    break;
+        if(player_turn(&game_arg, game_arg.second_player, game_arg.first_player))    break;
     }
 
     close(game_arg.first_player->player_socket);
@@ -154,9 +162,10 @@ int main(int argc, char const *argv[]) {
                 } else {
                     players[n_of_players].player_socket = i;
                     
+                    read_message(players[n_of_players].player_socket, buffer);      // for message type
                     read_message(players[n_of_players].player_socket, players[n_of_players].name);
 
-                    write_message(players[n_of_players].player_socket, "Waiting for player ...\n");
+                    write_message(players[n_of_players].player_socket, "Waiting for player ...\n", WAIT_FOR_PLAYER);
 
                     if(waiting_player == NULL) {
                         players[n_of_players].game_char = 'X';

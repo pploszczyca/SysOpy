@@ -31,12 +31,36 @@ typedef struct sockaddr SA;
 #define START_FIRST "FIRST\n"
 #define START_SECOND "SECOND\n"
 
+#define PING_MESSAGE "PING\n"
+
 void close_server(int fd){        // is_server = 0 if true
     shutdown(fd, SHUT_RDWR);
     close(fd);
 }
 
-void write_message(int socket_id, char *message){
+typedef enum message_type {
+    ADD_NEW_CLIENT = 'a',
+    ADD_ERROR = 'b',
+    YOUR_TURN = 'c',
+    WAIT = 'd',
+    BOARD = 'e',
+    MOVE = 'j',
+    GAME_START_INFORMATION = 'f',
+    PING = 'g',
+    ERROR = 'h',
+    WAIT_FOR_PLAYER = 'i',
+    WIN = 'k',
+    END_OF_GAME = 'l'
+} message_type;
+
+void write_only_message_type(int socket_id, message_type type_of_message) {
+    char type_buffer[2];
+    sprintf(type_buffer, "%c\n", type_of_message);
+    write(socket_id, type_buffer, strlen(type_buffer));
+}
+
+void write_message(int socket_id, char *message, message_type type_of_message){
+    write_only_message_type(socket_id, type_of_message);
     write(socket_id, message, strlen(message));
 }
 
@@ -52,17 +76,4 @@ void read_message(int socket_id, char buffer[MAX_BUFFER_SIZE]){
         
         strncat(buffer, &char_buffer, 1);
     }
-}
-
-void print_board(char *board_array){
-    printf("\n");
-
-    for(int i = 0; i < 3; i++){
-        printf("-------\n");
-        for(int j = 0; j < 3; j++){
-            printf("|%c", board_array[i*3+j]);
-        }
-        printf("|\n");
-    }
-    printf("-------\n");
 }

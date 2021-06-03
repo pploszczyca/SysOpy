@@ -1,6 +1,6 @@
 CC = gcc
 CFLAGS = -Wall
-PORT = 18000
+PORT = 18001
 
 serverCompile:
 	$(CC) $(CFLAGS) server.c -o server -lpthread
