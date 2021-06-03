@@ -36,11 +36,45 @@ int connect_to_server_local(char *server_adress) {
     return server_socket;
 }
 
+void make_move(int server_socket) {
+    char buffer[MAX_BUFFER_SIZE];
+
+    printf("Write number (1-9)\n");
+    scanf("%s", buffer);
+    strcat(buffer, "\n");
+    write_message(server_socket, buffer);
+}
+
+void read_and_print_message(int server_socket) {
+    char buffer[MAX_BUFFER_SIZE];
+    read_message(server_socket, buffer);
+    printf("%s\n", buffer);
+}
+
+void read_and_print_board(int server_socket) {
+    char buffer[MAX_BUFFER_SIZE];
+    read_message(server_socket, buffer);         // For board
+    print_board(buffer);
+}
+
+int wait_for_server_information(int server_socket) {
+    char server_buffer[MAX_BUFFER_SIZE];
+
+    read_message(server_socket, server_buffer);         // For board
+    if(strcmp(server_buffer, "WIN") == 0){
+        read_and_print_board(server_socket);     // For board
+        read_and_print_message(server_socket);
+        return 1;
+    }
+    print_board(server_buffer);
+
+    return 0;
+}
+
 int main(int argc, char const *argv[]) {
     char *client_name, *connection_type, *connection_path;     // connection_type = 'network' or 'local'
     int server_socket;
-    char server_buffer_write[MAX_BUFFER_SIZE], server_buffer[MAX_BUFFER_SIZE];
-    int n_read_chars;
+    char server_buffer[MAX_BUFFER_SIZE];
 
     check_error(argc == 4, "Bad arguments");
     client_name = argv[1];
@@ -60,56 +94,25 @@ int main(int argc, char const *argv[]) {
     strcat(client_name, "\n");
     write_message(server_socket, client_name);
 
-    read_message(server_socket, server_buffer);         // For "wait for player"
-    printf("%s\n", server_buffer);
-
-    read_message(server_socket, server_buffer);         // For "game start"
-    printf("%s\n", server_buffer);
+    read_and_print_message(server_socket);   // For "wait for player"
+    read_and_print_message(server_socket);   // For "game start"
     
-    read_message(server_socket, server_buffer);         // For board
-
-    print_board(server_buffer);
+    read_and_print_board(server_socket);     // For board
 
     read_message(server_socket, server_buffer);         // For information, who starts firts
     
     if(strcmp(server_buffer, "FIRST") == 0){
-        printf("Write number (1-9)\n");
-        scanf("%s", server_buffer_write);
-        strcat(server_buffer_write, "\n");
-        write_message(server_socket, server_buffer_write);
-
-        read_message(server_socket, server_buffer);         // For board
-        print_board(server_buffer);
+        make_move(server_socket);
+        read_and_print_board(server_socket);     // For board
     }
 
     for(;;) {
         printf("Wait for other player move\n");
-        read_message(server_socket, server_buffer);         // For board
-        if(strcmp(server_buffer, "WIN") == 0){
-            printf("END OF GAME\n");
-            read_message(server_socket, server_buffer);         // For board
-            print_board(server_buffer);
-            read_message(server_socket, server_buffer);
-            printf("%s\n", server_buffer);
-            break;
-        }
-        print_board(server_buffer);
+        if(wait_for_server_information(server_socket)) break;
 
-        printf("Write number (1-9)\n");
-        scanf("%s", server_buffer_write);
-        strcat(server_buffer_write, "\n");
-        write_message(server_socket, server_buffer_write);
+        make_move(server_socket);
 
-        read_message(server_socket, server_buffer);         // For board
-        if(strcmp(server_buffer, "WIN") == 0){
-            printf("END OF GAME\n");
-            read_message(server_socket, server_buffer);         // For board
-            print_board(server_buffer);
-            read_message(server_socket, server_buffer);
-            printf("%s\n", server_buffer);
-            break;
-        }
-        print_board(server_buffer);
+        if(wait_for_server_information(server_socket)) break;
     }
 
     close_server(server_socket);

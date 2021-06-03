@@ -62,7 +62,7 @@ int check_one_case(char *board, int a, int b, int c){       // for check_if_win 
 
 int check_if_win(char *board){      // 0 - true, -1 - false
     for(int i = 0; i < 3; i++){
-        if(check_one_case(board, i, i+1, i+2))  return 0;
+        if(check_one_case(board, i*3, i*3+1, i*3+2))  return 0;
         if(check_one_case(board, i, i+3, i+6))  return 0;
     }
     if(check_one_case(board, 0, 4, 8))  return 0;
@@ -96,23 +96,21 @@ int player_turn(game *game_arg, player *player){
     return 0;
 }
 
+void init_player_in_game(game *game_arg, player * client_player, char *second_player_name, char *who_start_first_message){
+    char player_buffer[MAX_BUFFER_SIZE];
+    sprintf(player_buffer, "GAME STARTED! Your char is: %c. You are playing with: %s\n",'X',second_player_name);
+    write_message(client_player->player_socket, player_buffer);
+    write_message(client_player->player_socket, game_arg->board);
+    write_message(client_player->player_socket, who_start_first_message);
+}
+
 void *start_game(void *arg){
-    char first_player_buffer[MAX_BUFFER_SIZE], second_player_buffer[MAX_BUFFER_SIZE];
     game game_arg = *(game *) arg;
     free(arg);
 
-    strcpy(game_arg.board, "         \n");        // Init board
-
-    sprintf(first_player_buffer, "GAME STARTED! Your char is: %c. You are playing with: %s\n",'X',game_arg.second_player->name);
-    write_message(game_arg.first_player->player_socket, first_player_buffer);
-
-    sprintf(second_player_buffer, "GAME STARTED! Your char is: %c. You are playing with: %s\n",'O',game_arg.first_player->name);
-    write_message(game_arg.second_player->player_socket, second_player_buffer);
-    
-    send_the_same_message_to_two_players(&game_arg, game_arg.board);
-
-    write_message(game_arg.first_player->player_socket, START_FIRST);
-    write_message(game_arg.second_player->player_socket, START_SECOND);    
+    // Send informations to players
+    init_player_in_game(&game_arg, game_arg.first_player, game_arg.second_player->name, START_FIRST);
+    init_player_in_game(&game_arg, game_arg.second_player, game_arg.first_player->name, START_SECOND); 
 
     for(;;) {       // Game turns
         if(player_turn(&game_arg, game_arg.first_player))    break;
@@ -167,6 +165,7 @@ int main(int argc, char const *argv[]) {
                     } else {
                         pthread_t thread_id;
                         game *game_arg = malloc(sizeof(game));
+                        strcpy(game_arg->board, "         \n");        // Init board
                         game_arg->first_player = waiting_player;
                         game_arg->second_player = &players[n_of_players];
                         players[n_of_players].game_char = 'O';
