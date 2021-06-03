@@ -3,10 +3,13 @@
 #define SERVER_BACKLOG 1
 #define MAX_PLAYERS_CONNECTED 20
 
+pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
+
 typedef struct player {
     char name[MAX_BUFFER_SIZE];
     int player_socket;
     char game_char;     // game_char = 'X' || 'O'
+    int connected;      // if player is connected 0 else -1
 } player;
 
 typedef struct game {
@@ -15,6 +18,11 @@ typedef struct game {
     char board[BOARD_SIZE];
 } game;
 
+// Global variables
+player **players;
+fd_set current_sockets;
+
+// SERVER INITIALIZE FUNCTIONS
 int setup_server_network(int port) {
     int server_socket;
     SA_IN server_addr;
@@ -47,6 +55,7 @@ int setup_server_local(char *path) {
     return server_socket;
 }
 
+// ACCEPTING NEW CONNECTION
 int accept_new_connection(int server_socket) {
     int addr_size = sizeof(SA_IN);
     int client_socket;
@@ -56,6 +65,58 @@ int accept_new_connection(int server_socket) {
     return client_socket;
 }
 
+// PLAYERS OPERATIONS
+int find_new_empty_index_for_players(char *player_name){
+    pthread_mutex_lock(&mutex);
+    for(int i = 0; i < MAX_PLAYERS_CONNECTED; i++)
+        if(players[i] != NULL && strcmp(players[i]->name, player_name) == 0) {
+            pthread_mutex_unlock(&mutex);
+            return -1;
+        }
+        else if(players[i] == NULL) {
+            pthread_mutex_unlock(&mutex);
+            return i;
+        }
+    pthread_mutex_unlock(&mutex);
+    return -1;
+}
+
+void init_players_array() {
+    players = (player *)calloc(MAX_PLAYERS_CONNECTED, sizeof(player *));
+    for(int i = 0; i < MAX_PLAYERS_CONNECTED; i++)  players[i] = NULL;
+}
+
+void remove_player_by_name(char *player_name) {
+    pthread_mutex_lock(&mutex);
+    for(int i = 0; i < MAX_PLAYERS_CONNECTED; i++)
+        if(players[i] != NULL && strcmp(players[i]->name, player_name) == 0) {
+            FD_CLR(players[i]->player_socket , &current_sockets);
+            free(players[i]);
+            players[i] = NULL;
+            
+            break;
+        }
+    pthread_mutex_unlock(&mutex);
+}
+
+void free_players_array() {
+    for(int i = 0; i < MAX_PLAYERS_CONNECTED; i++)
+        if(players[i] != NULL) 
+            free(players[i]);
+    free(players);
+}
+
+void change_to_connected(char *player_name) {
+    pthread_mutex_lock(&mutex);
+    for(int i = 0; i < MAX_PLAYERS_CONNECTED; i++)
+        if(players[i] != NULL && strcmp(players[i]->name, player_name) == 0) {
+            players[i]->connected = 0;
+            break;
+        }
+    pthread_mutex_unlock(&mutex);
+}
+
+// FUNCTIONS FOR Tic Tac Toe
 int check_one_case(char *board, int a, int b, int c){       // for check_if_win function
     return board[a] != ' ' && board[a] == board[b] && board[b] == board[c];
 }
@@ -71,6 +132,7 @@ int check_if_win(char *board){      // 0 - true, -1 - false
     return -1;
 }
 
+// SENDING INFORMATION
 void send_the_same_message_to_two_players(game *game_arg, char *message, message_type type_of_message){
     write_message(game_arg->first_player->player_socket, message, type_of_message);
     write_message(game_arg->second_player->player_socket, message, type_of_message);
@@ -112,6 +174,7 @@ void init_player_in_game(game *game_arg, player * client_player, char *second_pl
     write_message(client_player->player_socket, game_arg->board, BOARD);
 }
 
+// THREAD GAME OPERATIONS
 void *start_game(void *arg){
     game game_arg = *(game *) arg;
     free(arg);
@@ -127,19 +190,48 @@ void *start_game(void *arg){
 
     close(game_arg.first_player->player_socket);
     close(game_arg.second_player->player_socket);
+    remove_player_by_name(game_arg.first_player->name);
+    remove_player_by_name(game_arg.second_player->name);
+}
+
+
+void *ping(void *arg) {
+    char buffer[MAX_BUFFER_SIZE];
+    while(1) {
+        pthread_mutex_lock(&mutex);
+        for(int i = 0; i < MAX_PLAYERS_CONNECTED; i++){
+            if(players[i] != NULL && players[i]->connected == -1) {
+                printf("Removing: %s\n", players[i]->name);
+                remove_player_by_name(players[i]->name);
+            }
+        }
+        
+        for(int i = 0; i < MAX_PLAYERS_CONNECTED; i++){
+            if(players[i] != NULL) {
+                printf("Pinging: %s\n", players[i]->name);
+                sprintf(buffer, "%c\n", PING);
+                send(players[i]->player_socket, buffer, strlen(buffer), 0);
+                players[i]->connected = -1;
+            }
+        }
+
+        pthread_mutex_unlock(&mutex);
+        sleep(8);
+    }
 }
 
 int main(int argc, char const *argv[]) {
-    int port_number, server_socket_network, server_socket_local, n_of_players = 0;
-    char *socket_path;
+    int port_number, server_socket_network, server_socket_local, new_player_index;
+    char *socket_path, type_of_message;
     char buffer[MAX_BUFFER_SIZE];
-    fd_set current_sockets, ready_sockets;
-    player players[MAX_PLAYERS_CONNECTED];
+    fd_set ready_sockets;
     player *waiting_player = NULL;
 
     check_error(argc != 3, "Bad arguments");
     port_number = atoi(argv[1]);
     socket_path = argv[2];
+
+    init_players_array(players);
 
     server_socket_network = setup_server_network(port_number);
     server_socket_local = setup_server_local(socket_path);
@@ -148,6 +240,10 @@ int main(int argc, char const *argv[]) {
     FD_ZERO(&current_sockets);
     FD_SET(server_socket_network, &current_sockets);
     FD_SET(server_socket_local, &current_sockets);
+
+    // Pinging not work well
+    // pthread_t thread_ping;
+    // pthread_create(&thread_ping, NULL, ping, NULL);
 
     for(;;){
         ready_sockets = current_sockets;        // because select is destructive
@@ -160,33 +256,52 @@ int main(int argc, char const *argv[]) {
                     int client_socket = accept_new_connection(i);
                     FD_SET(client_socket, &current_sockets);
                 } else {
-                    players[n_of_players].player_socket = i;
-                    
-                    read_message(players[n_of_players].player_socket, buffer);      // for message type
-                    read_message(players[n_of_players].player_socket, players[n_of_players].name);
+                    read_message(i, buffer);      // for message type
+                    type_of_message = buffer[0];
+                    read_message(i, buffer);
 
-                    write_message(players[n_of_players].player_socket, "Waiting for player ...\n", WAIT_FOR_PLAYER);
+                    switch (type_of_message) {
+                        case ADD_NEW_CLIENT: {
+                            new_player_index = find_new_empty_index_for_players(buffer);
+                            if(new_player_index == -1) {
+                                write_only_message_type(i, ADD_ERROR);
+                            } else {
+                                pthread_mutex_lock(&mutex);
+                                players[new_player_index] = malloc(sizeof(player));
+                                players[new_player_index]->player_socket = i;
+                                strcpy(players[new_player_index]->name, buffer);
+                                players[new_player_index]->connected = 0;
+                                
+                                write_message(players[new_player_index]->player_socket, "Waiting for player ...\n", WAIT_FOR_PLAYER);
 
-                    if(waiting_player == NULL) {
-                        players[n_of_players].game_char = 'X';
-                        waiting_player = &players[n_of_players];
+                                if(waiting_player == NULL) {
+                                    players[new_player_index]->game_char = 'X';
+                                    waiting_player = players[new_player_index];
 
-                    } else {
-                        pthread_t thread_id;
-                        game *game_arg = malloc(sizeof(game));
-                        strcpy(game_arg->board, "         \n");        // Init board
-                        game_arg->first_player = waiting_player;
-                        game_arg->second_player = &players[n_of_players];
-                        players[n_of_players].game_char = 'O';
+                                } else {
+                                    pthread_t thread_id;
+                                    game *game_arg = malloc(sizeof(game));
+                                    strcpy(game_arg->board, "         \n");        // Init board
+                                    game_arg->first_player = waiting_player;
+                                    game_arg->second_player = players[new_player_index];
+                                    players[new_player_index]->game_char = 'O';
 
-                        pthread_create(&thread_id, NULL, start_game, game_arg);
+                                    pthread_create(&thread_id, NULL, start_game, game_arg);
 
-                        waiting_player = NULL;
+                                    waiting_player = NULL;
+                                }
+                            }
+                            pthread_mutex_unlock(&mutex);
+                            FD_CLR(i, &current_sockets);
+                            break;
+                        }
+
+                        case PING: {
+                            change_to_connected(buffer);
+                            printf("Changed to connected: %s\n", buffer);
+                            break;
+                        }
                     }
-
-                    n_of_players++;
-
-                    FD_CLR(i, &current_sockets);
                 }
             }
         }
@@ -195,5 +310,6 @@ int main(int argc, char const *argv[]) {
     close_server(server_socket_network);
     close_server(server_socket_local);
 
+    free_players_array();
     return 0;
 }

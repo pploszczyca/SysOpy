@@ -1,6 +1,6 @@
 CC = gcc
 CFLAGS = -Wall
-PORT = 18001
+PORT = 18002
 
 serverCompile:
 	$(CC) $(CFLAGS) server.c -o server -lpthread
@@ -12,7 +12,7 @@ server: serverCompile
 	./server $(PORT) ./us
 
 clientNetwork: clientCompile
-	./client Me network 127.0.0.1:$(PORT)
+	./client NetworkPlayer network 127.0.0.1:$(PORT)
 
 clientLocal: clientCompile
-	./client NotMe local ./us
+	./client LocalPlayer local ./us

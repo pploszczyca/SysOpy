@@ -11,32 +11,13 @@
 #include <threads.h>
 #include <pthread.h>
 
-int check_error(int expression, const char *message) {
-    if(expression == -1) {
-        perror(message);
-        exit(1);
-    }
-
-    return expression;
-}
-
-typedef struct sockaddr_in SA_IN;
-typedef struct sockaddr_un SA_UN;
-typedef struct sockaddr SA;
-
 #define MAX_PLAYER_NAME_SIZE 50
 #define MAX_BUFFER_SIZE 512
 #define BOARD_SIZE 10
 
-#define START_FIRST "FIRST\n"
-#define START_SECOND "SECOND\n"
-
-#define PING_MESSAGE "PING\n"
-
-void close_server(int fd){        // is_server = 0 if true
-    shutdown(fd, SHUT_RDWR);
-    close(fd);
-}
+typedef struct sockaddr_in SA_IN;
+typedef struct sockaddr_un SA_UN;
+typedef struct sockaddr SA;
 
 typedef enum message_type {
     ADD_NEW_CLIENT = 'a',
@@ -52,6 +33,20 @@ typedef enum message_type {
     WIN = 'k',
     END_OF_GAME = 'l'
 } message_type;
+
+int check_error(int expression, const char *message) {
+    if(expression == -1) {
+        perror(message);
+        exit(1);
+    }
+
+    return expression;
+}
+
+void close_server(int fd){        // is_server = 0 if true
+    shutdown(fd, SHUT_RDWR);
+    close(fd);
+}
 
 void write_only_message_type(int socket_id, message_type type_of_message) {
     char type_buffer[2];

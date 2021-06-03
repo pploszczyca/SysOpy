@@ -61,7 +61,6 @@ void read_and_print_board(int server_socket) {
     print_board(buffer);
 }
 
-
 int main(int argc, char const *argv[]) {
     char *client_name, *connection_type, *connection_path, type_of_message;     // connection_type = 'network' or 'local'
     int server_socket;
@@ -115,7 +114,7 @@ int main(int argc, char const *argv[]) {
                 break;
 
             case PING:
-                write_message(server_socket, PING_MESSAGE, PING);
+                write_message(server_socket, client_name, PING);
                 break;
 
             case ADD_ERROR:
