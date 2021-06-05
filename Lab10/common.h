@@ -31,7 +31,8 @@ typedef enum message_type {
     ERROR = 'h',
     WAIT_FOR_PLAYER = 'i',
     WIN = 'k',
-    END_OF_GAME = 'l'
+    END_OF_GAME = 'l',
+    DRAW = 'm'
 } message_type;
 
 int check_error(int expression, const char *message) {
@@ -71,4 +72,10 @@ void read_message(int socket_id, char buffer[MAX_BUFFER_SIZE]){
         
         strncat(buffer, &char_buffer, 1);
     }
+}
+
+char read_type_of_message(int socket_id) {
+    char buffer[MAX_BUFFER_SIZE];
+    read_message(socket_id, buffer);
+    return buffer[0];
 }

@@ -1,5 +1,7 @@
 #include "common.h"
 
+char *client_name;
+
 int connect_to_server_network(char *server_adress){
     int server_socket, port;
     SA_IN server_addr;
@@ -61,8 +63,20 @@ void read_and_print_board(int server_socket) {
     print_board(buffer);
 }
 
+void * ping_response(void *arg) {
+    int server_socket = *(int *) arg;
+    char type_of_message;
+
+    for(;;) {
+        type_of_message = read_type_of_message(server_socket);
+
+        if(type_of_message == PING)
+            write_message(server_socket, client_name, PING);
+    }
+}
+
 int main(int argc, char const *argv[]) {
-    char *client_name, *connection_type, *connection_path, type_of_message;     // connection_type = 'network' or 'local'
+    char *connection_type, *connection_path, type_of_message;     // connection_type = 'network' or 'local'
     int server_socket;
     char server_buffer[MAX_BUFFER_SIZE];
 
@@ -85,8 +99,7 @@ int main(int argc, char const *argv[]) {
     write_message(server_socket, client_name, ADD_NEW_CLIENT);
 
     for(;;) {
-        read_message(server_socket, server_buffer);
-        type_of_message = server_buffer[0];
+        type_of_message = read_type_of_message(server_socket);
 
         switch (type_of_message) {
             case WAIT_FOR_PLAYER:
@@ -98,8 +111,13 @@ int main(int argc, char const *argv[]) {
                 break;
 
             case YOUR_TURN: {
+                pthread_t thread_id;
+                pthread_create(&thread_id, NULL, ping_response, &server_socket);
+
                 printf("Write number (1-9)\n");
+
                 scanf("%s", server_buffer);
+                pthread_cancel(thread_id);
                 strcat(server_buffer, "\n");
                 write_message(server_socket, server_buffer, MOVE);
                 break;
@@ -130,6 +148,11 @@ int main(int argc, char const *argv[]) {
                 break;
             }
 
+            case DRAW: {
+                read_and_print_message(server_socket);
+                break;
+            }
+
             case END_OF_GAME: {
                 close_server(server_socket);
                 exit(0);
@@ -139,7 +162,6 @@ int main(int argc, char const *argv[]) {
                 printf("TYPE OF MESSAGE ERROR\n");
                 close_server(server_socket);
                 exit(1);
-                break;
         }
     }
 

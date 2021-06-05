@@ -1,12 +1,12 @@
 CC = gcc
 CFLAGS = -Wall
-PORT = 18002
+PORT = 18004
 
 serverCompile:
 	$(CC) $(CFLAGS) server.c -o server -lpthread
 
 clientCompile:
-	$(CC) $(CFLAGS) client.c -o client
+	$(CC) $(CFLAGS) client.c -o client -lpthread
 
 server: serverCompile
 	./server $(PORT) ./us
