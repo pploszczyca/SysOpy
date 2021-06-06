@@ -2,6 +2,7 @@
 
 #define SERVER_BACKLOG 1
 #define MAX_PLAYERS_CONNECTED 20
+#define MAX_GAMES 15
 
 typedef struct player {
     char name[MAX_BUFFER_SIZE];
@@ -21,6 +22,7 @@ typedef struct game {
 pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
 player *waiting_player;
 player **players;
+game ** games;
 fd_set current_main_sockets;
 
 // SERVER INITIALIZE FUNCTIONS
@@ -66,6 +68,25 @@ int accept_new_connection(int server_socket) {
     return client_socket;
 }
 
+// GAMES OPERATIONS
+void init_games_array() {
+    games = (game *) calloc(MAX_GAMES, sizeof(game *));
+    for(int i = 0; i < MAX_GAMES; i++)  games[i] = NULL;
+}
+
+int find_new_index_for_game() {
+    for(int i = 0; i < MAX_GAMES; i++)
+        if(games[i] == NULL)    return i;
+}
+
+void delete_game(game *game_arg) {
+    for(int i = 0; i < MAX_GAMES; i++)
+        if(games[i] == game_arg) {
+            free(games[i]);
+            games[i] = NULL;
+        }
+}
+
 // PLAYERS OPERATIONS
 int find_new_empty_index_for_players(char *player_name){
     pthread_mutex_lock(&mutex);
@@ -87,11 +108,29 @@ void init_players_array() {
     for(int i = 0; i < MAX_PLAYERS_CONNECTED; i++)  players[i] = NULL;
 }
 
-void remove_player_by_name(char *player_name) {
+void remove_player_by_name(char *player_name, int end_of_game) {        // end_of_game - 1 true, 0 false
     for(int i = 0; i < MAX_PLAYERS_CONNECTED; i++)
         if(players[i] != NULL && strcmp(players[i]->name, player_name) == 0) {
             printf("Removing: %s\n", players[i]->name);
-            if(strcmp(players[i]->name, waiting_player->name) == 0) waiting_player = NULL;
+            if(waiting_player != NULL && strcmp(players[i]->name, waiting_player->name) == 0) waiting_player = NULL;
+            else if(!end_of_game){
+                for(int j = 0; j < MAX_GAMES; j++){
+                    if(games[j] != NULL) {
+                        player * second_tmp_player = NULL;
+
+                        if(games[j]->first_player == players[i])    second_tmp_player = games[j]->second_player;
+                        else if(games[j]->second_player == players[i])    second_tmp_player = games[j]->first_player;
+
+                        if(second_tmp_player != NULL) {
+                            write_message(second_tmp_player->player_socket, "Second player error connection!\n", ERROR);
+                            pthread_cancel(games[j]->thread_id);
+                            remove_player_by_name(second_tmp_player->name, 1);
+                            break;
+                        }
+                    }
+                }
+            }
+
             FD_CLR(players[i]->player_socket, &current_main_sockets);
             close(players[i]->player_socket);
             free(players[i]);
@@ -229,24 +268,24 @@ void init_player_in_game(game *game_arg, player * client_player, char *second_pl
 
 // THREAD GAME OPERATIONS
 void *start_game(void *arg){
-    game game_arg = *(game *) arg;
-    free(arg);
+    game *game_arg = (game *) arg;
 
     // Send informations to players
-    init_player_in_game(&game_arg, game_arg.first_player, game_arg.second_player->name);
-    init_player_in_game(&game_arg, game_arg.second_player, game_arg.first_player->name); 
+    init_player_in_game(game_arg, game_arg->first_player, game_arg->second_player->name);
+    init_player_in_game(game_arg, game_arg->second_player, game_arg->first_player->name); 
 
     for(;;) {       // Game turns
-        if(player_turn(&game_arg, game_arg.first_player, game_arg.second_player))    break;
-        if(player_turn(&game_arg, game_arg.second_player, game_arg.first_player))    break;
+        if(player_turn(game_arg, game_arg->first_player, game_arg->second_player))    break;
+        if(player_turn(game_arg, game_arg->second_player, game_arg->first_player))    break;
     }
 
-    close(game_arg.first_player->player_socket);
-    close(game_arg.second_player->player_socket);
+    close(game_arg->first_player->player_socket);
+    close(game_arg->second_player->player_socket);
 
     pthread_mutex_lock(&mutex);
-    remove_player_by_name(game_arg.first_player->name);
-    remove_player_by_name(game_arg.second_player->name);
+    remove_player_by_name(game_arg->first_player->name, 1);
+    remove_player_by_name(game_arg->second_player->name, 1);
+    delete_game(game_arg);
     pthread_mutex_unlock(&mutex);
 }
 
@@ -257,7 +296,7 @@ void *ping(void *arg) {
         pthread_mutex_lock(&mutex);
         for(int i = 0; i < MAX_PLAYERS_CONNECTED; i++)
             if(players[i] != NULL && players[i]->connected == -1) 
-                remove_player_by_name(players[i]->name);
+                remove_player_by_name(players[i]->name, 0);
         
         for(int i = 0; i < MAX_PLAYERS_CONNECTED; i++){
             if(players[i] != NULL) {
@@ -284,7 +323,8 @@ int main(int argc, char const *argv[]) {
     port_number = atoi(argv[1]);
     socket_path = argv[2];
 
-    init_players_array(players);
+    init_players_array();
+    init_games_array();
 
     server_socket_network = setup_server_network(port_number);
     server_socket_local = setup_server_local(socket_path);
@@ -331,17 +371,18 @@ int main(int argc, char const *argv[]) {
                                     waiting_player = players[new_player_index];
 
                                 } else {
-                                    game *game_arg = malloc(sizeof(game));
-                                    strcpy(game_arg->board, "         \n");        // Init board
-                                    game_arg->first_player = waiting_player;
-                                    game_arg->second_player = players[new_player_index];
+                                    int game_index = find_new_index_for_game();
+                                    games[game_index] = malloc(sizeof(game));
+                                    strcpy(games[game_index]->board, "         \n");        // Init board
+                                    games[game_index]->first_player = waiting_player;
+                                    games[game_index]->second_player = players[new_player_index];
                                     players[new_player_index]->game_char = 'O';
 
                                     // Remove playing players from listening
-                                    FD_CLR(game_arg->first_player->player_socket, &current_main_sockets);
-                                    FD_CLR(game_arg->second_player ->player_socket, &current_main_sockets);
+                                    FD_CLR(games[game_index]->first_player->player_socket, &current_main_sockets);
+                                    FD_CLR(games[game_index]->second_player ->player_socket, &current_main_sockets);
 
-                                    pthread_create(&game_arg->thread_id, NULL, start_game, game_arg);
+                                    pthread_create(&games[game_index]->thread_id, NULL, start_game, games[game_index]);
 
                                     waiting_player = NULL;
                                 }

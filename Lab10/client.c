@@ -72,6 +72,10 @@ void * ping_response(void *arg) {
 
         if(type_of_message == PING)
             write_message(server_socket, client_name, PING);
+        else if(type_of_message == ERROR) {
+            read_and_print_message(server_socket);
+            exit(1);
+        }
     }
 }
 
@@ -140,7 +144,7 @@ int main(int argc, char const *argv[]) {
                 exit(1);
 
             case ERROR:
-                printf("Error appear!\n");
+                read_and_print_message(server_socket);
                 exit(1);
 
             case WIN:{
